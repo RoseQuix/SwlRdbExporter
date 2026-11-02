@@ -557,5 +557,12 @@
     "isSwl": true,
     "id": 1065211,
     "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Heightmaps",
+    "isSwl": true,
+    "id": 1066604,
+    "otherDesc": "GHM1 converted to 16-bit PNG; world height = sample x scale / 256.",
+    "exporterType": "RdbExporter.Exporters.HeightmapExporter"
   }
 ]

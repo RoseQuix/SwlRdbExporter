@@ -38,6 +38,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `JsonExporter` is the base for binary → JSON exporters: override `Parse(entry, data)` and throw `InvalidDataException` for entries that don't parse.
 - `ItemTemplateExporter` / `ItemTemplateParser` decode item (1000620) and spell (1000621) templates. Some entries store string lengths in UTF-16 units (a bug in Funcom's export tool); the parser backtracks over the possible readings and records them in `StringReadings`.
 - `DataTableExporter` / `DataTableParser` decode the 42 small one-entry tables (feats, hair, playfield parents, XP, tokens, game tweaks, login rewards, …), one layout function per type. Columns without a known meaning are written as `Values` arrays.
+- `HeightmapExporter` writes GHM1 heightmaps (1066604) as 16-bit greyscale PNG through `Utilities/PngWriter` (SkiaSharp can't encode 16-bit grey), with a JSON sidecar holding the scale.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` splits concatenated JPEGs on `FF D9` and stitches map tiles using hard-coded grid-size detection, with a 7px overlap offset.
 - `VoiceoverExporter` slices from the first `OggS` marker.
