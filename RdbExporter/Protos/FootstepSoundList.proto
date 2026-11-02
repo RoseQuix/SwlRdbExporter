@@ -1,0 +1,16 @@
+// inferred from the data (1000638): the client has no schema for this type, so unnamed fields keep their numbers
+syntax = "proto2";
+option csharp_namespace = "RdbExporter.Protos";
+
+message FootstepSoundList {
+  message FootstepSound {
+    optional uint32 id = 1;
+    optional string name = 2;
+    optional float unknown_3 = 3;
+    optional float unknown_4 = 4;
+    optional int32 unknown_5 = 5;
+    optional int32 unknown_6 = 6;
+  }
+  optional uint32 version = 1;
+  repeated FootstepSoundList.FootstepSound sound = 2;
+}

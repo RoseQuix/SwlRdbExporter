@@ -1049,5 +1049,29 @@
     "otherDesc": "Text XML, root <rivers>.",
     "exporterType": "RdbExporter.Exporters.RawFileExporter",
     "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "Footstep Sounds",
+    "isSwl": true,
+    "id": 1000638,
+    "otherDesc": "Protobuf (schema inferred, not in the client): 23 surfaces, id and \"Footstep:<surface>\" name.",
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "FootstepSoundList" ]
+  },
+  {
+    "name": "Unknown Protobuf 1000105",
+    "isSwl": true,
+    "id": 1000105,
+    "otherDesc": "5 bytes of protobuf, {1: 1, 3: 3392}; never requested by the client.",
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "VersionedValue" ]
+  },
+  {
+    "name": "Unknown Protobuf 1000107",
+    "isSwl": true,
+    "id": 1000107,
+    "otherDesc": "4 bytes of protobuf, {1: 1, 3: 0}; never requested by the client.",
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "VersionedValue" ]
   }
 ]

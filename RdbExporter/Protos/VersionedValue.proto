@@ -1,0 +1,8 @@
+// inferred from the data (1000105, 1000107): one entry each, {1: 1, 3: value}; nothing in the client reads them
+syntax = "proto2";
+option csharp_namespace = "RdbExporter.Protos";
+
+message VersionedValue {
+  optional uint32 version = 1;
+  optional uint32 unknown_3 = 3;
+}
