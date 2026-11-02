@@ -67,12 +67,18 @@
     "exporterType": "RdbExporter.Exporters.MergedJpgExporter"
   },
   {
+    "name": "Grass Layer Maps 1",
+    "isSwl": true,
     "id": 1010210,
+    "otherDesc": "Per grass layer PNG (id = playfield << 16 | layer), presumably density; not examined beyond the loader.",
     "exporterType": "RdbExporter.Exporters.RawFileExporter",
     "exporterArguments": [ ".png" ]
   },
   {
+    "name": "Grass Layer Maps 2",
+    "isSwl": true,
     "id": 1010211,
+    "otherDesc": "Per grass layer PNG (id = playfield << 16 | layer), presumably density; not examined beyond the loader.",
     "exporterType": "RdbExporter.Exporters.RawFileExporter",
     "exporterArguments": [ ".png" ]
   },
@@ -83,10 +89,108 @@
     "exporterArguments": [ ".txt" ]
   },
   {
-    "name": "Unknown Textures",
+    "name": "Terrain Tile Maps",
+    "isSwl": true,
     "id": 1066603,
+    "otherDesc": "Per LOD-0 ground chunk (id = playfield × 10000 + y × 100 + x): 256 × 256 RGB layer blend weights.",
     "exporterType": "RdbExporter.Exporters.RawFileExporter",
     "exporterArguments": [ ".png" ]
+  },
+  {
+    "name": "Vegetation Textures",
+    "isSwl": true,
+    "id": 1010217,
+    "otherDesc": "Grass source textures (TGA; one entry is a misfiled GMSH mesh), never loaded: the client uses the 1010218 atlas.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".tga" ]
+  },
+  {
+    "name": "XML Cars",
+    "isSwl": true,
+    "id": 1010216,
+    "otherDesc": "Text XML, root <cars>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Decal Projectors",
+    "isSwl": true,
+    "id": 1000519,
+    "otherDesc": "Text XML, root <DecalProjectors>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Room and Portal Systems",
+    "isSwl": true,
+    "id": 1010300,
+    "otherDesc": "Text XML, root <RoomAndPortalSystem>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Climbing Areas",
+    "isSwl": true,
+    "id": 1000070,
+    "otherDesc": "Text XML, root <climbingareas>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Climbing Dynel Data",
+    "isSwl": true,
+    "id": 1000095,
+    "otherDesc": "Text XML, root <climbingdyneldata>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML BCT Groups",
+    "isSwl": true,
+    "id": 1010202,
+    "otherDesc": "Text XML, root <bctgroup>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML BCT Meshes",
+    "isSwl": true,
+    "id": 1010203,
+    "otherDesc": "Text XML, root <bctmesh>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Ocean Volumes",
+    "isSwl": true,
+    "id": 1000097,
+    "otherDesc": "Text XML, root <OceanVolumesRootNode>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Volumetric Fogs",
+    "isSwl": true,
+    "id": 1000098,
+    "otherDesc": "Text XML, root <VolumetricFogsRootNode>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Movement Sets",
+    "isSwl": true,
+    "id": 1010205,
+    "otherDesc": "Text XML, root <movementset>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Character Creation",
+    "isSwl": true,
+    "id": 1010700,
+    "otherDesc": "Text XML (<root>): tint packages, character scale limits and per-sex base heads.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
   },
   {
     "name": "Sound Sets",
