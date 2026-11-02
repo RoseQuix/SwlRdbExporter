@@ -705,5 +705,12 @@
     "id": 1000076,
     "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "MorphNames" ]
+  },
+  {
+    "name": "Grass Configs",
+    "isSwl": true,
+    "id": 1010220,
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "GrassConfig" ]
   }
 ]
