@@ -1,11 +1,11 @@
 ﻿using RdbExporter.Utilities;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace RdbExporter.Parsers
@@ -14,12 +14,12 @@ namespace RdbExporter.Parsers
     {
         static readonly SwfTagCode[] IMAGE_CODES = { SwfTagCode.DefineBitsLossless, SwfTagCode.DefineBitsLossless2, SwfTagCode.DefineBitsJpeg2, SwfTagCode.DefineBitsJpeg3, SwfTagCode.DefineBitsJpeg4 };
 
-        public static IEnumerable<Image> ParseImagesFromSwfFile(string file)
+        public static IEnumerable<SKBitmap> ParseImagesFromSwfFile(string file)
         {
             return ParseImagesFromSwfFile(File.OpenRead(file));
         }
 
-        public static IEnumerable<Image> ParseImagesFromSwfFile(Stream stream)
+        public static IEnumerable<SKBitmap> ParseImagesFromSwfFile(Stream stream)
         {
             using (stream)
             {
@@ -45,7 +45,7 @@ namespace RdbExporter.Parsers
                 return ReadHeaderAndImages(reader);
             }
         }
-        private static IEnumerable<Image> ReadHeaderAndImages(BittableBinaryReader reader)
+        private static IEnumerable<SKBitmap> ReadHeaderAndImages(BittableBinaryReader reader)
         {
             ReadRect(reader);
             var framerate = reader.ReadInt16();
@@ -90,7 +90,7 @@ namespace RdbExporter.Parsers
             return new SwfTag() { Code = (SwfTagCode)code, Data = data };
         }
 
-        private static Image HandleImageTag(SwfTag tag)
+        private static SKBitmap HandleImageTag(SwfTag tag)
         {
             return tag.Code switch
             {
@@ -102,7 +102,7 @@ namespace RdbExporter.Parsers
             };
         }
 
-        private static Image HandleLossless(SwfTag tag, bool alpha)
+        private static SKBitmap HandleLossless(SwfTag tag, bool alpha)
         {
             var binaryReader = new BinaryReader(new MemoryStream(tag.Data));
             var characterId = binaryReader.ReadUInt16();
@@ -127,76 +127,109 @@ namespace RdbExporter.Parsers
                     if (alpha)
                     {
                         //32 bit RGBA
-                        colorTable[i] = Color.FromArgb(decompressedData[dataIndex + 3], decompressedData[dataIndex + 0], decompressedData[dataIndex + 1], decompressedData[dataIndex + 2]).ToArgb();
+                        colorTable[i] = Rgba(decompressedData[dataIndex + 0], decompressedData[dataIndex + 1], decompressedData[dataIndex + 2], decompressedData[dataIndex + 3]);
                         dataIndex += 4; 
                     }
                     else
                     {
                         //24 bit RGB
-                        colorTable[i] = Color.FromArgb(255, decompressedData[dataIndex + 0], decompressedData[dataIndex + 1], decompressedData[dataIndex + 2]).ToArgb();
+                        colorTable[i] = Rgba(decompressedData[dataIndex + 0], decompressedData[dataIndex + 1], decompressedData[dataIndex + 2], 255);
                         dataIndex += 3;
                     }
                 }
             }
 
-            var bitmap = new Bitmap(width, height);
-            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
+            var pixels = new int[width * height];
             int imageIndex = 0;
-            unsafe
+            for (int y = 0; y < height; y++)
             {
-                Span<int> imagePointer = new Span<int>(bitmapData.Scan0.ToPointer(), width * height);
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                 {
-                    for (int x = 0; x < width; x++)
+                    if (format == 5)
                     {
-                        if (format == 5)
+                        if (alpha)
                         {
-                            if (alpha)
-                            {
-                                //32 bit RGBA
-                                imagePointer[imageIndex] = Color.FromArgb(decompressedData[dataIndex], decompressedData[dataIndex + 1], decompressedData[dataIndex + 2], decompressedData[dataIndex + 3]).ToArgb();
-                                dataIndex += 4;
-                            }
-                            else
-                            {
-                                //32 bits, but the first 8 bits should be ignored, rest is RGB
-                                imagePointer[imageIndex] = Color.FromArgb(255, decompressedData[dataIndex + 1], decompressedData[dataIndex + 2], decompressedData[dataIndex + 3]).ToArgb();
-                                dataIndex += 4;
-                            }
+                            //32 bit ARGB
+                            pixels[imageIndex] = Rgba(decompressedData[dataIndex + 1], decompressedData[dataIndex + 2], decompressedData[dataIndex + 3], decompressedData[dataIndex]);
+                            dataIndex += 4;
                         }
-                        else if (format == 3)
+                        else
                         {
-                            //8 bit, pointer to color table
-                            imagePointer[imageIndex] = colorTable[decompressedData[dataIndex]];
-                            dataIndex += 1;
+                            //32 bits, but the first 8 bits should be ignored, rest is RGB
+                            pixels[imageIndex] = Rgba(decompressedData[dataIndex + 1], decompressedData[dataIndex + 2], decompressedData[dataIndex + 3], 255);
+                            dataIndex += 4;
                         }
-                        imageIndex += 1;
                     }
-                    
-                    //Scan lines are aligned to 32-bit lengths, check if we need to adjust for padding
-                    if (format == 3 && width % 4 > 0)
+                    else if (format == 3)
                     {
-                        dataIndex += 4 - width % 4;
+                        //8 bit, pointer to color table
+                        pixels[imageIndex] = colorTable[decompressedData[dataIndex]];
+                        dataIndex += 1;
                     }
+                    imageIndex += 1;
+                }
+
+                //Scan lines are aligned to 32-bit lengths, check if we need to adjust for padding
+                if (format == 3 && width % 4 > 0)
+                {
+                    dataIndex += 4 - width % 4;
                 }
             }
-            bitmap.UnlockBits(bitmapData);
+            //Lossless2 colors are stored premultiplied by alpha
+            var bitmap = new SKBitmap(new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Premul));
+            Marshal.Copy(pixels, 0, bitmap.GetPixels(), pixels.Length);
             return bitmap;
         }
 
-        private static Image HandleJpeg3(SwfTag tag)
+        private static int Rgba(byte r, byte g, byte b, byte a)
+        {
+            return r | g << 8 | b << 16 | a << 24;
+        }
+
+        private static SKBitmap HandleJpeg3(SwfTag tag)
         {
             using var binaryReader = new BinaryReader(new MemoryStream(tag.Data, 0, 6));
             _ = binaryReader.ReadUInt16(); //characterId
             int alphaDataOffset = (int)binaryReader.ReadUInt32(); //Not a safe cast probably
-            return Image.FromStream(new MemoryStream(tag.Data, 6, alphaDataOffset));
+            return DecodeImage(FixJpegTables(tag.Data, 6, alphaDataOffset));
         }
 
-        private static Image HandleJpeg2(SwfTag tag)
+        private static SKBitmap HandleJpeg2(SwfTag tag)
         {
             using var binaryReader = new BinaryReader(new MemoryStream(tag.Data, 0, 2));
             _ = binaryReader.ReadUInt16(); //characterId
-            return Image.FromStream(new MemoryStream(tag.Data, 2, tag.Data.Length - 2));
+            return DecodeImage(FixJpegTables(tag.Data, 2, tag.Data.Length - 2));
+        }
+
+        private static SKBitmap DecodeImage(Stream stream)
+        {
+            return SKBitmap.Decode(stream) ?? throw new ArgumentException("Unable to decode image data.");
+        }
+
+        //SWF JPEG data can have the encoding tables in their own SOI..EOI block, directly followed by the image's SOI
+        //Remove the EOI/SOI pair between them so it becomes a single valid JPEG
+        private static MemoryStream FixJpegTables(byte[] data, int offset, int length)
+        {
+            int end = offset + length;
+            int i = offset + 2; //Skip SOI
+            while (i + 4 <= end && data[i] == 0xFF)
+            {
+                byte marker = data[i + 1];
+                if (marker == 0xD9)
+                {
+                    if (data[i + 2] == 0xFF && data[i + 3] == 0xD8)
+                    {
+                        var merged = new byte[length - 4];
+                        Array.Copy(data, offset, merged, 0, i - offset);
+                        Array.Copy(data, i + 4, merged, i - offset, end - i - 4);
+                        return new MemoryStream(merged);
+                    }
+                    break;
+                }
+                if (marker == 0xDA) break; //Start of scan, no separate tables block
+                i += 2 + (data[i + 2] << 8 | data[i + 3]);
+            }
+            return new MemoryStream(data, offset, length);
         }
 
         private static byte[] ReadAll(Stream stream)

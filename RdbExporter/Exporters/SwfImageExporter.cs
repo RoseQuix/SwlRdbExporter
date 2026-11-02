@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using RdbExporter.Entities;
-using System.Drawing.Imaging;
+using SkiaSharp;
 using RdbExporter.Parsers;
 using System.IO;
 using System;
@@ -20,7 +20,10 @@ namespace RdbExporter.Exporters
                     foreach (var image in SwfImageParser.ParseImagesFromSwfFile(rdbEntry.OpenEntryFile(parameters.SwlInstallDir).BaseStream))
                     {
                         string filename = rdbEntry.Id + (i++ > 0 ? "-" + i : "") + ".png";
-                        image.Save(Path.Combine(parameters.ExportDirectory, filename), ImageFormat.Png);
+                        using (var output = File.Create(Path.Combine(parameters.ExportDirectory, filename)))
+                        {
+                            image.Encode(output, SKEncodedImageFormat.Png, 100);
+                        }
                         image.Dispose();
                     }
                 }

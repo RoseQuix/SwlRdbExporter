@@ -2,8 +2,7 @@
 using System.Linq;
 using RdbExporter.Entities;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
+using SkiaSharp;
 using System;
 using System.Threading.Tasks;
 
@@ -20,13 +19,13 @@ namespace RdbExporter.Exporters
         {
             using var file = rdbEntry.OpenEntryFile(parameters.SwlInstallDir);
             var bytes = file.ReadBytes(rdbEntry.FileLength);
-            var streams = new List<MemoryStream>();
+            var streams = new List<ArraySegment<byte>>();
             int nextStartIndex = 0;
             for (int i = 1; i < bytes.Length; i++)
             {
                 if (bytes[i] == 0xFF && bytes[i + 1] == 0xD9)
                 {
-                    streams.Add(new MemoryStream(bytes, nextStartIndex, i - nextStartIndex + 2));
+                    streams.Add(new ArraySegment<byte>(bytes, nextStartIndex, i - nextStartIndex + 2));
                     nextStartIndex = i + 2;
                 }
             }
@@ -34,10 +33,10 @@ namespace RdbExporter.Exporters
             //After that, the map is split into N segments
             //Layouts such as 4x4, 8x8, 16x16, 3x3, 6x6, 12x12, 24x24
             //Also non-square layouts like 2x3, 4x6, 8x12, 16x32
-            Image finalImage;
+            SKBitmap finalImage;
             if(streams.Count == 1)
             {
-                finalImage = Image.FromStream(streams.First());
+                finalImage = SKBitmap.Decode(streams.First().AsSpan());
             }
             else
             {
@@ -98,31 +97,26 @@ namespace RdbExporter.Exporters
                 //Some overlap in the images, account for that when merging with an offset
                 const int OFFSET = 7;
                 int width = 0, height = 0;
-                using (Image image = Image.FromStream(streams[0]))
-                {
-                    width = image.Width - OFFSET;
-                    height = image.Height - OFFSET;
-                    finalImage = new Bitmap(width * widthInImageNumbers, height * heightInImageNumbers);
-                }
-                using var graphics = Graphics.FromImage(finalImage);
+                var imageInfo = SKBitmap.DecodeBounds(streams[0].AsSpan());
+                width = imageInfo.Width - OFFSET;
+                height = imageInfo.Height - OFFSET;
+                finalImage = new SKBitmap(width * widthInImageNumbers, height * heightInImageNumbers);
+                using var canvas = new SKCanvas(finalImage);
                 for (int y = 0; y < heightInImageNumbers; y++)
                 {
                     for (int x = 0; x < widthInImageNumbers; x++)
                     {
-                        using Image image = Image.FromStream(streams[x + y * widthInImageNumbers]);
-                        PointF ulCorner = new PointF(x * width, y * height);
-                        PointF urCorner = new PointF(x * width + width + OFFSET, y * height);
-                        PointF llCorner = new PointF(x * width, y * height + height + OFFSET);
-                        PointF[] destPara = { ulCorner, urCorner, llCorner };
-                        graphics.DrawImage(image, destPara);
+                        using var image = SKBitmap.Decode(streams[x + y * widthInImageNumbers].AsSpan());
+                        canvas.DrawBitmap(image, x * width, y * height, SKSamplingOptions.Default, null);
                     }
                 }
-                graphics.Save();
             }
 
             if(finalImage != null)
             {
-                finalImage.Save(Path.Combine(parameters.ExportDirectory, $"{rdbEntry.Id}.jpg"), ImageFormat.Jpeg);
+                using var output = File.Create(Path.Combine(parameters.ExportDirectory, $"{rdbEntry.Id}.jpg"));
+                finalImage.Encode(output, SKEncodedImageFormat.Jpeg, 75);
+                finalImage.Dispose();
             }
         }
     }
