@@ -975,7 +975,7 @@
     "id": 1010028,
     "otherDesc": "Text XML, root <scriptgroup>: ScryScript groups (mostly 3D sounds), placed by 1000504.",
     "exporterType": "RdbExporter.Exporters.RawFileExporter",
-    "exporterArguments": [ ".xml" ]
+    "exporterArguments": [ ".xml", "AppendExtension" ]
   },
   {
     "name": "XML Monster Data",

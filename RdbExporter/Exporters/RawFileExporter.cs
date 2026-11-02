@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace RdbExporter.Exporters
 {
+    /// <summary>
+    /// Writes entries as they are. Arguments[0] is the extension; with Arguments[1] = "AppendExtension" it's added to real
+    /// filenames that end in anything else, for types whose names carry other extensions or dots.
+    /// </summary>
     public class RawFileExporter : IExporter
     {
         public void RunExport(ExportParameters parameters)
@@ -17,7 +21,8 @@ namespace RdbExporter.Exporters
 
         public void Process(ExportParameters parameters, IDBRIndexEntrty entry)
         {
-            var outputPath = Helpers.GetOutputPath(parameters, entry, parameters.Arguments[0]);
+            var appendExtension = parameters.Arguments.Count > 1 && parameters.Arguments[1] == "AppendExtension";
+            var outputPath = Helpers.GetOutputPath(parameters, entry, parameters.Arguments[0], appendExtension: appendExtension);
 
             using var reader = entry.OpenEntryFile(parameters.SwlInstallDir);
             using var writer = File.OpenWrite(outputPath);

@@ -68,7 +68,7 @@ namespace RdbExporter.Utilities
         /// <paramref name="extension"/> if <paramref name="replaceNamedExtension"/> is set), otherwise its ID with <paramref name="extension"/>.
         /// Some names are shared by several IDs of a type, so those also get the ID appended.
         /// </summary>
-        public static string GetOutputPath(ExportParameters parameters, IDBRIndexEntrty entry, string extension, bool replaceNamedExtension = false)
+        public static string GetOutputPath(ExportParameters parameters, IDBRIndexEntrty entry, string extension, bool replaceNamedExtension = false, bool appendExtension = false)
         {
             if (GetFilenameIndex(parameters.SwlInstallDir).TryGetValue(entry.Type, out var idToNameDictionary) && idToNameDictionary.TryGetValue(entry.Id, out var filename))
             {
@@ -83,6 +83,11 @@ namespace RdbExporter.Utilities
                     name += $".{entry.Id}";
                 }
                 var namedExtension = Path.GetExtension(filename);
+                if (appendExtension && !namedExtension.Equals(extension, StringComparison.OrdinalIgnoreCase))
+                {
+                    //Keep the whole name: some names have dots that aren't extensions ("delay_2.5s_1")
+                    return Path.Combine(parameters.ExportDirectory, name + namedExtension + extension);
+                }
                 return Path.Combine(parameters.ExportDirectory, name + (replaceNamedExtension || namedExtension == "" ? extension : namedExtension));
             }
             return Path.ChangeExtension(Path.Combine(parameters.ExportDirectory, entry.Id.ToString()), extension);
