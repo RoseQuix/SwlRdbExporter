@@ -643,5 +643,12 @@
     "id": 1000102,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "Doors" ]
+  },
+  {
+    "name": "Destructibles",
+    "isSwl": true,
+    "id": 1000061,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "Destructibles" ]
   }
 ]

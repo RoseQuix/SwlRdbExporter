@@ -23,6 +23,7 @@ namespace RdbExporter.Parsers
             ["SensorVolumes"] = SensorVolumes,
             ["EnvironmentAreas"] = EnvironmentAreas,
             ["Doors"] = Doors,
+            ["Destructibles"] = Destructibles,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -309,6 +310,17 @@ namespace RdbExporter.Parsers
                 });
             }
             return new { Version = version, Doors = doors };
+        }
+
+        /// <summary>
+        /// Destructibles (1000061, DestructibleManager_c): array of 21 × u32 records (the second is a 1010030 .idx visual),
+        /// then a BoxCluster tree. Empty in every entry of this build.
+        /// </summary>
+        private static object Destructibles(SpanReader r, NameLookup name)
+        {
+            var destructibles = new List<uint[]>();
+            for (var i = BinaryStreamCount(r, 30000); i > 0; i--) destructibles.Add(r.U32s(21));
+            return new { Destructibles = destructibles, Tree = BoxCluster(r) };
         }
 
         /// <summary>BoxCluster_t: array children, f32 box[6], u8 isLeaf, [isLeaf] u32 index.</summary>
