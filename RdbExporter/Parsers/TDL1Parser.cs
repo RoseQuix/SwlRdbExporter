@@ -8,68 +8,54 @@ using System.Text;
 
 namespace RdbExporter.Parsers
 {
+    /// <summary>
+    /// TDL1 language files (1030001, and the older copies in Data/text/*.tdbl):
+    ///   "TDL1", 4 × {i32 length, UTF-8, NUL}: language code, English name, native name, plural rule;
+    ///   i32 count, count × {i32 category, i32 TDC2 table id (1030002)}; 2 zero bytes;
+    ///   i32 count, count × {i32 category, i32 length + name, i32 length + column} (only some categories have one);
+    ///   two lists of i32 count + ids, unknown (the first lists categories).
+    /// </summary>
     public class TDL1Parser
     {
-        public static TDL1File ParseTDL1File(string file)
+        public static TDL1File ParseTDL1File(string file) => Parse(File.ReadAllBytes(file));
+
+        public static TDL1File Parse(byte[] data)
         {
-            var binaryReader = new BinaryReader(File.OpenRead(file));
-
-            var header = Encoding.ASCII.GetString(binaryReader.ReadBytes(4));
-            if (header != "TDL1") throw new InvalidOperationException("Not a TDL1 file.");
-
-            var languageCode = binaryReader.ReadInt32PrefacedString();
-            var languageNameInEnglish = binaryReader.ReadInt32PrefacedString();
-            var languageNameInLanguage = binaryReader.ReadInt32PrefacedString();
-
-            binaryReader.ReadInt32PrefacedString(); //String "(N == 1) /? 1 /: -1" is this some sort of expression? Probably no significance
-
-            var entryCount = binaryReader.ReadInt32();
-
-            var entries = ReadePairs(binaryReader, entryCount).ToList();
-
-            binaryReader.ReadBytes(2); //What are these two bytes? Just a buffer? Both null so maybe
-
-            var nameEntryCount = binaryReader.ReadInt32();
-            var namesAndDescriptions = ReadeIdAndStringPairs(binaryReader, nameEntryCount).ToList();
-
-            //Not sure what these last two groups of IDs mean. Some of them are duplicated numbers from the above entries and descriptions, others not.
-            var unknownIdsCount = binaryReader.ReadInt32();
-            var unknownIds = Enumerable.Range(0, unknownIdsCount).Select((i) => binaryReader.ReadInt32()).ToList();
-
-            var unknownIdsCount2 = binaryReader.ReadInt32();
-            var unknownIds2 = Enumerable.Range(0, unknownIdsCount2).Select((i) => binaryReader.ReadInt32()).ToList();
-
-            var languageFileEntries = entries.Join(namesAndDescriptions, (entry) => entry.Item1, (nameAndDesc) => nameAndDesc.Item1,
-                (entry, nameAndDesc) => new TDL1Entry()
-                {
-                    RdbId = entry.Item1,
-                    FileId = entry.Item2,
-                    FriendlyName = nameAndDesc.Item2,
-                    Type = nameAndDesc.Item3
-                }).ToList();
-
-            return new TDL1File()
+            var r = new SpanReader(data);
+            if (r.Latin1(4) != "TDL1") throw new InvalidDataException("Not a TDL1 file.");
+            string ReadString(bool terminated)
             {
-                LanguageCode = languageCode,
-                LanguageName = languageNameInEnglish,
-                LanguageNameInLanguage = languageNameInLanguage,
-                Entries = languageFileEntries
+                var value = Encoding.UTF8.GetString(r.Bytes(r.I32()));
+                if (terminated && r.U8() != 0) throw new InvalidDataException("String without its NUL terminator.");
+                return value;
+            }
+
+            var file = new TDL1File
+            {
+                LanguageCode = ReadString(true),
+                LanguageName = ReadString(true),
+                LanguageNameInLanguage = ReadString(true),
+                PluralRule = ReadString(true),
             };
-        }
+            var tables = Enumerable.Range(0, r.I32()).Select(_ => (Category: r.I32(), TableId: r.I32())).ToList();
+            if (r.U16() != 0) throw new InvalidDataException("Non-zero bytes after the table list.");
+            var names = new Dictionary<int, (string Name, string Column)>();
+            for (var n = r.I32(); n > 0; n--)
+            {
+                names[r.I32()] = (ReadString(false), ReadString(false));
+            }
+            file.UnknownIds = Enumerable.Range(0, r.I32()).Select(_ => r.I32()).ToList();
+            file.UnknownIds2 = Enumerable.Range(0, r.I32()).Select(_ => r.I32()).ToList();
+            r.ExpectEnd();
 
-        static IEnumerable<Tuple<int, int>> ReadePairs(BinaryReader reader, int count)
-        {
-            for(int i = 0; i < count; i++)
+            file.Entries = tables.Select(t =>
             {
-                yield return Tuple.Create(reader.ReadInt32(), reader.ReadInt32());
-            }
-        }
-        static IEnumerable<Tuple<int, string, string>> ReadeIdAndStringPairs(BinaryReader reader, int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                yield return Tuple.Create(reader.ReadInt32(), reader.ReadInt32PrefacedString(false), reader.ReadInt32PrefacedString(false));
-            }
+                names.TryGetValue(t.Category, out var name);
+                return new TDL1Entry { Category = t.Category, TableId = t.TableId, Name = name.Name, Column = name.Column };
+            }).ToList();
+            var unlisted = names.Keys.Except(tables.Select(t => t.Category)).ToList();
+            if (unlisted.Count > 0) throw new InvalidDataException($"Names for categories without a table: {string.Join(", ", unlisted)}.");
+            return file;
         }
     }
 }

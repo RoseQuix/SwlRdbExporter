@@ -1077,9 +1077,8 @@
     "name": "Language Files",
     "isSwl": true,
     "id": 1030001,
-    "otherDesc": "TDL1, the same format as Data/text/*.tdbl.",
-    "exporterType": "RdbExporter.Exporters.RawFileExporter",
-    "exporterArguments": [ ".tdbl" ]
+    "otherDesc": "TDL1 as JSON: language, plural rule and each string category's 1030002 table. The Strings export sorts its tables with these.",
+    "exporterType": "RdbExporter.Exporters.LanguageFileExporter"
   },
   {
     "name": "Unused Sensor Volumes",
