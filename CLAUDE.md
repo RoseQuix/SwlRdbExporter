@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A .NET 5 console tool (`RdbExporter`) that extracts assets from Secret World Legends (SWL) `.rdbdata` archive files. It needs a real SWL install directory to do anything; there is no sample data and no test project in the repo.
+A .NET 8 console tool (`RdbExporter`) that extracts assets from Secret World Legends (SWL) `.rdbdata` archive files. It needs a real SWL install directory to do anything; there is no sample data and no test project in the repo.
 
 ## Commands
 
@@ -29,16 +29,16 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 
 **Exporters of note:**
 - `RawFileExporter` takes the file extension as `Arguments[0]`. It uses the filename index (RDB type `1000010`, ID 1, parsed by `FilenameIndexParser` and cached in `Helpers.GetFilenameIndex`) for real filenames when available.
-- `StringExporter` ignores `RdbFileEntries` and pulls type `1030002` (TDC2 string tables, `TDC2Parser`) directly from the index. It names output via language files `<install>/Data/Text/*.tdbl` (TDL1, `TDL1Parser`), and writes per-language JSON plus an `Unknown` folder for unreferenced tables.
+- `StringExporter` ignores `RdbFileEntries` and pulls type `1030002` (TDC2 string tables, `TDC2Parser`) directly from the index. It names output via language files `<install>/Data/Text/*.tdbl` (folder name matched case-insensitively) (TDL1, `TDL1Parser`), and writes per-language JSON plus an `Unknown` folder for unreferenced tables.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` splits concatenated JPEGs on `FF D9` and stitches map tiles using hard-coded grid-size detection, with a 7px overlap offset.
 - `VoiceoverExporter` slices from the first `OggS` marker.
 
-## Platform caveats
+## Cross-platform notes
 
-The code was written for Windows:
-- `Helpers` loads `Data/RdbTypes.json`, but the file on disk is `Data/RDBTypes.json`. On a case-sensitive filesystem this lookup fails.
-- `StringExporter` builds a path with a literal backslash (`@"Data\Text\"`).
-- Image exporters depend on `System.Drawing.Common` (GDI+).
+The tool runs on Linux and Windows. Keep it that way:
+- Image code uses SkiaSharp, with Linux native assets from NuGet (`SkiaSharp.NativeAssets.Linux.NoDependencies`). Don't reintroduce `System.Drawing`, which is Windows-only on modern .NET.
+- Build paths with `Path.Combine`, and match the casing of files in the repo exactly. Game install folders can differ in case between platforms (Linux installs have `Data/text`), so `StringExporter` finds that folder case-insensitively.
+- `SwfImageParser.FixJpegTables` merges SWF JPEG tags whose encoding tables sit in a separate SOI..EOI block. libjpeg rejects that layout, though GDI+ tolerated it.
 
 `Data/StringTypes.json` is copied to the output directory but is not referenced by any code.
