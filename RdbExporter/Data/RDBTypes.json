@@ -760,6 +760,13 @@
     "exporterArguments": [ "GroundDescriptor", "KeepInnerHeader" ]
   },
   {
+    "name": "Ground Chunks",
+    "isSwl": true,
+    "id": 1066602,
+    "otherDesc": "GRNC terrain chunks as OBJ (grid units), one group per texture batch.",
+    "exporterType": "RdbExporter.Exporters.GroundChunkExporter"
+  },
+  {
     "name": "Collision Tag Maps",
     "isSwl": true,
     "id": 1066609,
