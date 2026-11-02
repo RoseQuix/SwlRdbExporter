@@ -6,16 +6,18 @@ using System.Linq;
 
 namespace RdbExporter.Parsers
 {
+    /// <summary>Filename of an RDB entry from the filename index, or null.</summary>
+    public delegate string LayoutNameLookup(uint type, uint id);
+
     /// <summary>
     /// Per-playfield placement types. Each layout function decodes one entry (after the inner header) to plain
     /// dictionaries and lists for JSON, and calls <c>name(type, id)</c> to look up filenames of referenced RDB entries.
+    /// LayoutExporter checks that the whole entry was consumed.
     /// Field names follow the notes; unnamed fields keep the notes' placeholder names (v2a, v4b, ...).
     /// </summary>
     public static class PlacementParser
     {
-        public delegate string NameLookup(uint type, uint id);
-
-        public static readonly Dictionary<string, Func<SpanReader, NameLookup, object>> Layouts = new()
+        public static readonly Dictionary<string, Func<SpanReader, LayoutNameLookup, object>> Layouts = new()
         {
             ["Lights"] = Lights,
             ["Dynels"] = Dynels,
@@ -29,15 +31,6 @@ namespace RdbExporter.Parsers
             ["BoundedAreaReverb"] = BoundedAreaReverb,
             ["EnvironmentSettings"] = EnvironmentSettings,
         };
-
-        public static object Parse(string layout, byte[] data, NameLookup name)
-        {
-            if (!Layouts.TryGetValue(layout, out var parse)) throw new ArgumentException($"Unknown placement layout '{layout}'.");
-            var reader = new SpanReader(data);
-            var result = parse(reader, name);
-            reader.ExpectEnd();
-            return result;
-        }
 
         private static readonly string[] LightTypes = { null, "Point", "Spot", "RectArea" };
         private static readonly string[] FlickerTypes = { "None", "RandomSmooth", "RandomStep", "Sinus" };
@@ -53,7 +46,7 @@ namespace RdbExporter.Parsers
         ///         f32 v4h, v4i, v4j; u32 v4k; f32 rotation[4] (x, y, z, w)
         ///   &gt;= 5: u32 castShadow;  &gt;= 6: u8 v6a; f32 v6b;  &gt;= 7: f32 area[4]
         /// </summary>
-        private static object Lights(SpanReader r, NameLookup name)
+        private static object Lights(SpanReader r, LayoutNameLookup name)
         {
             var first = r.I32();
             uint version, count;
@@ -131,7 +124,7 @@ namespace RdbExporter.Parsers
         ///   u32 visualType, visualId; &gt;= 2: f32 bounds[6] (local min xyz, max xyz); &gt;= 3: u32 object id (a game
         ///   object of type 55000); &gt;= 4: u8 flag; string tag (4 characters)
         /// </summary>
-        private static object Dynels(SpanReader r, NameLookup name)
+        private static object Dynels(SpanReader r, LayoutNameLookup name)
         {
             var count = r.U32();
             var records = new List<Dictionary<string, object>>();
@@ -168,7 +161,7 @@ namespace RdbExporter.Parsers
         /// Particle effect placements (1000058, GameData::PlayfieldEffects_c), id = playfield or playfield | 0x40000000.
         /// u32 count, then count × {string name; u32 effect (1010207); f32 position[3]; f32 rotation[4] (x, y, z, w); f32 scale}
         /// </summary>
-        private static object Particles(SpanReader r, NameLookup name)
+        private static object Particles(SpanReader r, LayoutNameLookup name)
         {
             var count = r.U32();
             var records = new List<Dictionary<string, object>>();
@@ -191,7 +184,7 @@ namespace RdbExporter.Parsers
         ///   f32 position[3] (all zero: none); u32 script (1010028 script group); &gt;= 2: u32 activation radius in metres
         ///   (version 1: 70); &gt;= 3: u32 instance id; u16 n, name; u16 n, description; u16 count × {u16 n, name; u16 n, value}
         /// </summary>
-        private static object ScryScripts(SpanReader r, NameLookup name)
+        private static object ScryScripts(SpanReader r, LayoutNameLookup name)
         {
             var version = r.U32();
             if (version < 1 || version > 3) throw new InvalidDataException($"Unsupported version {version}.");
@@ -216,7 +209,7 @@ namespace RdbExporter.Parsers
         }
 
         /// <summary>u16 n (at most 10000), char[n].</summary>
-        private static string ShortString(SpanReader r)
+        internal static string ShortString(SpanReader r)
         {
             var length = r.U16();
             if (length > 10000) throw new InvalidDataException($"Invalid string length {length}.");
@@ -230,7 +223,7 @@ namespace RdbExporter.Parsers
         ///     indices); string name}
         ///   array {u32 key, u32 value}; array {string name, u32 value}; BoxCluster tree over the volumes
         /// </summary>
-        private static object SensorVolumes(SpanReader r, NameLookup name)
+        private static object SensorVolumes(SpanReader r, LayoutNameLookup name)
         {
             var version = r.U32();
             if (version != 1) throw new InvalidDataException($"Unsupported version {version}.");
@@ -258,7 +251,7 @@ namespace RdbExporter.Parsers
         ///   (of cell 0, 0, 0); f32 halfSize (cells are 2 × halfSize wide); u32 nx, ny, nz; &gt;= 2: u32 (unused);
         ///   per cell: version &lt; 3: u32 value, else u32 n, n × u32 value. Values are 1060667 environment ids.
         /// </summary>
-        private static object EnvironmentAreas(SpanReader r, NameLookup name)
+        private static object EnvironmentAreas(SpanReader r, LayoutNameLookup name)
         {
             var areas = new List<Dictionary<string, object>>();
             for (var count = r.U32(); count > 0; count--)
@@ -292,7 +285,7 @@ namespace RdbExporter.Parsers
         ///   u16 n, name; u32 object (a game object of type 55000); u16 n, label; u8 flag; u32 a; f32 b;
         ///   f32 position[3]; f32 rotation[4] (x, y, z, w); f32 box[6] (min, max); u32 c, d
         /// </summary>
-        private static object Doors(SpanReader r, NameLookup name)
+        private static object Doors(SpanReader r, LayoutNameLookup name)
         {
             var version = r.U32();
             var doors = new List<object>();
@@ -320,7 +313,7 @@ namespace RdbExporter.Parsers
         /// Destructibles (1000061, DestructibleManager_c): array of 21 × u32 records (the second is a 1010030 .idx visual),
         /// then a BoxCluster tree. Empty in every entry of this build.
         /// </summary>
-        private static object Destructibles(SpanReader r, NameLookup name)
+        private static object Destructibles(SpanReader r, LayoutNameLookup name)
         {
             var destructibles = new List<uint[]>();
             for (var i = BinaryStreamCount(r, 30000); i > 0; i--) destructibles.Add(r.U32s(21));
@@ -332,7 +325,7 @@ namespace RdbExporter.Parsers
         /// u32 version, u32 count, then count × {u32 volume; u32 priority (7: always plays); &gt;= 2: u8 group;
         /// u32 n, n × u32 script (indices into the playfield's 1000504 ScryScripts)}
         /// </summary>
-        private static object BoundedAreaScripts(SpanReader r, NameLookup name)
+        private static object BoundedAreaScripts(SpanReader r, LayoutNameLookup name)
         {
             var version = r.U32();
             var records = new List<object>();
@@ -364,7 +357,7 @@ namespace RdbExporter.Parsers
         /// Bounded-area reverb (1040008), keyed by 1000055 sensor volume. u32 version, u32 count, then
         /// count × {u32 volume; u32 preset (index into ReverbPresets); u8 priority (used from version 2 on, else 0)}
         /// </summary>
-        private static object BoundedAreaReverb(SpanReader r, NameLookup name)
+        private static object BoundedAreaReverb(SpanReader r, LayoutNameLookup name)
         {
             var version = r.U32();
             var records = new List<object>();
@@ -387,7 +380,7 @@ namespace RdbExporter.Parsers
         ///   optional: u32 1, str precipitation XML
         /// str = u32 n, UTF-8.
         /// </summary>
-        private static object EnvironmentSettings(SpanReader r, NameLookup name)
+        private static object EnvironmentSettings(SpanReader r, LayoutNameLookup name)
         {
             if (!r.Bytes(4).SequenceEqual("nEfP"u8)) throw new InvalidDataException("No nEfP magic (old format).");
             var version = r.U32();
@@ -436,10 +429,10 @@ namespace RdbExporter.Parsers
             return new { Version = version, Settings = settings, Environment = environment, Sky = sky, RainSnowXml = rainSnow };
         }
 
-        private static string Utf8String(SpanReader r) => System.Text.Encoding.UTF8.GetString(r.Bytes((int)r.U32()));
+        internal static string Utf8String(SpanReader r) => System.Text.Encoding.UTF8.GetString(r.Bytes((int)r.U32()));
 
         /// <summary>BoxCluster_t: array children, f32 box[6], u8 isLeaf, [isLeaf] u32 index.</summary>
-        private static object BoxCluster(SpanReader r)
+        internal static object BoxCluster(SpanReader r)
         {
             var children = new List<object>();
             for (var i = BinaryStreamCount(r, 30000); i > 0; i--) children.Add(BoxCluster(r));
@@ -449,7 +442,7 @@ namespace RdbExporter.Parsers
         }
 
         /// <summary>BinaryStream array count, stored as (n + 1) × 1009.</summary>
-        private static int BinaryStreamCount(SpanReader r, int limit)
+        internal static int BinaryStreamCount(SpanReader r, int limit)
         {
             var word = r.U32();
             if (word % 1009 != 0 || word / 1009 < 1 || word / 1009 - 1 > limit) throw new InvalidDataException($"Bad count word 0x{word:x} at 0x{r.Position - 4:x}.");
@@ -457,7 +450,7 @@ namespace RdbExporter.Parsers
         }
 
         /// <summary>u16 n, char[n]; n = 0xffff is followed by u16 0x1ff and a u32 length (BinaryStream::ReadString).</summary>
-        private static string BinaryStreamString(SpanReader r)
+        internal static string BinaryStreamString(SpanReader r)
         {
             int length = r.U16();
             if (length == 0xffff)

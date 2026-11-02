@@ -599,84 +599,84 @@
     "name": "Light Sets",
     "isSwl": true,
     "id": 1000049,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "Lights" ]
   },
   {
     "name": "Simple Dynels",
     "isSwl": true,
     "id": 1000057,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "Dynels" ]
   },
   {
     "name": "Particle Effect Placements",
     "isSwl": true,
     "id": 1000058,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "Particles" ]
   },
   {
     "name": "ScryScript Placements",
     "isSwl": true,
     "id": 1000504,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "ScryScripts" ]
   },
   {
     "name": "Sensor Volumes",
     "isSwl": true,
     "id": 1000055,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "SensorVolumes" ]
   },
   {
     "name": "Environment Areas",
     "isSwl": true,
     "id": 1000059,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "EnvironmentAreas" ]
   },
   {
     "name": "Doors",
     "isSwl": true,
     "id": 1000102,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "Doors" ]
   },
   {
     "name": "Destructibles",
     "isSwl": true,
     "id": 1000061,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "Destructibles" ]
   },
   {
     "name": "Bounded Area Ambience",
     "isSwl": true,
     "id": 1040007,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "BoundedAreaScripts" ]
   },
   {
     "name": "Bounded Area Reverb",
     "isSwl": true,
     "id": 1040008,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "BoundedAreaReverb" ]
   },
   {
     "name": "Bounded Area Music",
     "isSwl": true,
     "id": 1040009,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "BoundedAreaScripts" ]
   },
   {
     "name": "Environment Settings",
     "isSwl": true,
     "id": 1060668,
-    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "EnvironmentSettings" ]
   },
   {
