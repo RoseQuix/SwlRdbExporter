@@ -629,5 +629,12 @@
     "id": 1000055,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "SensorVolumes" ]
+  },
+  {
+    "name": "Environment Areas",
+    "isSwl": true,
+    "id": 1000059,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "EnvironmentAreas" ]
   }
 ]

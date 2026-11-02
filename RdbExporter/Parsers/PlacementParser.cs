@@ -21,6 +21,7 @@ namespace RdbExporter.Parsers
             ["Particles"] = Particles,
             ["ScryScripts"] = ScryScripts,
             ["SensorVolumes"] = SensorVolumes,
+            ["EnvironmentAreas"] = EnvironmentAreas,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -243,6 +244,41 @@ namespace RdbExporter.Parsers
             var names = new List<object>();
             for (var i = BinaryStreamCount(r, 1000000); i > 0; i--) names.Add(new { Name = BinaryStreamString(r), Value = r.U32() });
             return new { Version = version, Flag = flag, Volumes = volumes, Map = map, Names = names, Tree = BoxCluster(r) };
+        }
+
+        /// <summary>
+        /// Environment areas (1000059, RDBEnvArea_c). u32 count, then count areas:
+        ///   u32 version (1-4); u16 n, name; &gt;= 4: u32 unbounded (1: y range widened to -10000..10000); f32 centre[3]
+        ///   (of cell 0, 0, 0); f32 halfSize (cells are 2 × halfSize wide); u32 nx, ny, nz; &gt;= 2: u32 (unused);
+        ///   per cell: version &lt; 3: u32 value, else u32 n, n × u32 value. Values are 1060667 environment ids.
+        /// </summary>
+        private static object EnvironmentAreas(SpanReader r, NameLookup name)
+        {
+            var areas = new List<Dictionary<string, object>>();
+            for (var count = r.U32(); count > 0; count--)
+            {
+                var version = r.U32();
+                if (version < 1 || version > 4) throw new InvalidDataException($"Unsupported area version {version}.");
+                var area = new Dictionary<string, object>
+                {
+                    ["Version"] = version,
+                    ["Name"] = r.Latin1(r.U16()),
+                    ["Unbounded"] = version >= 4 ? r.U32() : 0u,
+                    ["Centre"] = r.F32s(3),
+                    ["HalfSize"] = r.F32(),
+                };
+                var dimensions = r.U32s(3);
+                area["Dimensions"] = dimensions;
+                if (version >= 2) area["Unused"] = r.U32();
+                var cells = new List<uint[]>();
+                for (long i = (long)dimensions[0] * dimensions[1] * dimensions[2]; i > 0; i--)
+                {
+                    cells.Add(version < 3 ? new[] { r.U32() } : r.U32s((int)r.U32()));
+                }
+                area["Cells"] = cells;
+                areas.Add(area);
+            }
+            return new { Areas = areas };
         }
 
         /// <summary>BoxCluster_t: array children, f32 box[6], u8 isLeaf, [isLeaf] u32 index.</summary>
