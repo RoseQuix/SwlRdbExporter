@@ -1,123 +1,63 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using RdbExporter.Entities;
-using System.IO;
+﻿using RdbExporter.Entities;
+using RdbExporter.Parsers;
+using RdbExporter.Utilities;
 using SkiaSharp;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RdbExporter.Exporters
 {
+    /// <summary>
+    /// Stitches the zone maps (1010013): each entry is a pyramid of JPEG tiles, laid out by the MTIL tile index (1010012)
+    /// with the same ID. The largest level is exported. Its tiles are drawn at the level's tile size, and in most maps
+    /// the JPEGs carry a 4-pixel border on each side, so each tile is cropped around its centre.
+    /// </summary>
     public class MergedJpgExporter : IExporter
     {
+        private const int TileIndexType = 1010012;
+
         public void RunExport(ExportParameters parameters)
         {
-            Parallel.ForEach(parameters.RdbFileEntries, (rdbEntry) => Process(parameters, rdbEntry));
+            var tileIndexes = Helpers.GetRdbIndex(parameters.SwlInstallDir).Where(e => e.Type == TileIndexType).ToDictionary(e => e.Id);
+            Parallel.ForEach(parameters.RdbFileEntries, entry =>
+            {
+                try
+                {
+                    if (!tileIndexes.TryGetValue(entry.Id, out var tileIndexEntry)) throw new InvalidDataException("No MTIL tile index.");
+                    Process(parameters, entry, MtilParser.Parse(tileIndexEntry.ReadAllBytes(parameters.SwlInstallDir)));
+                }
+                catch (InvalidDataException e)
+                {
+                    Console.Error.WriteLine($"RDB ID '{entry.Id}': {e.Message}");
+                }
+            });
         }
 
-        private static void Process(ExportParameters parameters, IDBRIndexEntrty rdbEntry)
+        private static void Process(ExportParameters parameters, IDBRIndexEntrty entry, MtilParser.TileIndex tileIndex)
         {
-            using var file = rdbEntry.OpenEntryFile(parameters.SwlInstallDir);
-            var bytes = file.ReadBytes(rdbEntry.FileLength);
-            var streams = new List<ArraySegment<byte>>();
-            int nextStartIndex = 0;
-            for (int i = 1; i < bytes.Length; i++)
-            {
-                if (bytes[i] == 0xFF && bytes[i + 1] == 0xD9)
-                {
-                    streams.Add(new ArraySegment<byte>(bytes, nextStartIndex, i - nextStartIndex + 2));
-                    nextStartIndex = i + 2;
-                }
-            }
-            //The first image in the file is always the whole map as a single small image
-            //After that, the map is split into N segments
-            //Layouts such as 4x4, 8x8, 16x16, 3x3, 6x6, 12x12, 24x24
-            //Also non-square layouts like 2x3, 4x6, 8x12, 16x32
-            SKBitmap finalImage;
-            if(streams.Count == 1)
-            {
-                finalImage = SKBitmap.Decode(streams.First().AsSpan());
-            }
-            else
-            {
-                int widthInImageNumbers = 0, heightInImageNumbers = 0;
-                if (streams.Count == 1 + 4 * 4)
-                {
-                    widthInImageNumbers = heightInImageNumbers = 4;
-                    streams = streams.Skip(1).ToList();
-                }
-                else if (streams.Count == 1 + 4 * 4 + 8 * 8)
-                {
-                    widthInImageNumbers = heightInImageNumbers = 8;
-                    streams = streams.Skip(1).Skip(4 * 4).ToList();
-                }
-                else if(streams.Count == 1 + 4 * 4 + 8 * 8 + 16 * 16)
-                {
-                    widthInImageNumbers = heightInImageNumbers = 16;
-                    streams = streams.Skip(1).Skip(4 * 4).Skip(8 * 8).ToList();
-                }
-                //3x3, 6x6, 12x12, 24x24....
-                else if (streams.Count == 1 + 3 * 3)
-                {
-                    widthInImageNumbers = heightInImageNumbers = 3;
-                    streams = streams.Skip(1).ToList();
-                }
-                else if (streams.Count == 1 + 3 * 3 + 6 * 6)
-                {
-                    widthInImageNumbers = heightInImageNumbers = 6;
-                    streams = streams.Skip(1).Skip(3 * 3).ToList();
-                }
-                else if (streams.Count == 1 + 3 * 3 + 6 * 6 + 12 * 12)
-                {
-                    widthInImageNumbers = heightInImageNumbers = 12;
-                    streams = streams.Skip(1).Skip(3 * 3).Skip(6 * 6).ToList();
-                }
-                else if (streams.Count == 1 + 3 * 3 + 6 * 6 + 12 * 12 + 24 * 24)
-                {
-                    widthInImageNumbers = heightInImageNumbers = 24;
-                    streams = streams.Skip(1).Skip(3 * 3).Skip(6 * 6).Skip(12 * 12).ToList();
-                }
-                else if (streams.Count == 1 + 2 * 3 + 4 * 6 + 8 * 12 + 16 * 24)
-                {
-                    //Non-square map
-                    //2x3, 4x12, 8x12, 16x24
-                    widthInImageNumbers = 16;
-                    heightInImageNumbers = 24;
-                    streams = streams.Skip(1).Skip(2 * 3).Skip(4 * 6).Skip(8 * 12).ToList();
-                }
-                else
-                {
-#if DEBUG
-                    throw new Exception("Couldn't merge images, not a square number.");
-#else
-                    Console.WriteLine($"Unable to process file '{0}', couldn't determine grid layout. Found {streams.Count} images.");
-#endif
-                }
+            var tiles = entry.ReadAllBytes(parameters.SwlInstallDir);
+            var level = tileIndex.Levels[^1];
 
-                //Some overlap in the images, account for that when merging with an offset
-                const int OFFSET = 7;
-                int width = 0, height = 0;
-                var imageInfo = SKBitmap.DecodeBounds(streams[0].AsSpan());
-                width = imageInfo.Width - OFFSET;
-                height = imageInfo.Height - OFFSET;
-                finalImage = new SKBitmap(width * widthInImageNumbers, height * heightInImageNumbers);
-                using var canvas = new SKCanvas(finalImage);
-                for (int y = 0; y < heightInImageNumbers; y++)
+            using var finalImage = new SKBitmap(level.Columns * level.TileWidth, level.Rows * level.TileHeight);
+            using (var canvas = new SKCanvas(finalImage))
+            {
+                for (var i = 0; i < level.Tiles.Length; i++)
                 {
-                    for (int x = 0; x < widthInImageNumbers; x++)
-                    {
-                        using var image = SKBitmap.Decode(streams[x + y * widthInImageNumbers].AsSpan());
-                        canvas.DrawBitmap(image, x * width, y * height, SKSamplingOptions.Default, null);
-                    }
+                    var (offset, size) = level.Tiles[i];
+                    if ((long)offset + size > tiles.Length) throw new InvalidDataException($"Tile {i} lies outside the map data.");
+                    using var image = SKBitmap.Decode(tiles.AsSpan(offset, size)) ?? throw new InvalidDataException($"Tile {i} is not a valid JPEG.");
+                    var borderX = (image.Width - level.TileWidth) / 2;
+                    var borderY = (image.Height - level.TileHeight) / 2;
+                    var source = SKRect.Create(borderX, borderY, level.TileWidth, level.TileHeight);
+                    var destination = SKRect.Create(i % level.Columns * level.TileWidth, i / level.Columns * level.TileHeight, level.TileWidth, level.TileHeight);
+                    canvas.DrawBitmap(image, source, destination);
                 }
             }
 
-            if(finalImage != null)
-            {
-                using var output = File.Create(Path.Combine(parameters.ExportDirectory, $"{rdbEntry.Id}.jpg"));
-                finalImage.Encode(output, SKEncodedImageFormat.Jpeg, 75);
-                finalImage.Dispose();
-            }
+            using var output = File.Create(Path.Combine(parameters.ExportDirectory, $"{entry.Id}.jpg"));
+            finalImage.Encode(output, SKEncodedImageFormat.Jpeg, 75);
         }
     }
 }

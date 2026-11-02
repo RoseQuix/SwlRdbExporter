@@ -564,5 +564,13 @@
     "id": 1066604,
     "otherDesc": "GHM1 converted to 16-bit PNG; world height = sample x scale / 256.",
     "exporterType": "RdbExporter.Exporters.HeightmapExporter"
+  },
+  {
+    "name": "Map Tile Indexes",
+    "isSwl": true,
+    "id": 1010012,
+    "otherDesc": "MTIL; the Maps export uses these to lay out its tiles.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".mtil" ]
   }
 ]

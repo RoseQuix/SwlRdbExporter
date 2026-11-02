@@ -40,7 +40,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `DataTableExporter` / `DataTableParser` decode the 42 small one-entry tables (feats, hair, playfield parents, XP, tokens, game tweaks, login rewards, …), one layout function per type. Columns without a known meaning are written as `Values` arrays.
 - `HeightmapExporter` writes GHM1 heightmaps (1066604) as 16-bit greyscale PNG through `Utilities/PngWriter` (SkiaSharp can't encode 16-bit grey), with a JSON sidecar holding the scale.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
-- `MergedJpgExporter` splits concatenated JPEGs on `FF D9` and stitches map tiles using hard-coded grid-size detection, with a 7px overlap offset.
+- `MergedJpgExporter` stitches the largest level of each map (1010013) using the MTIL tile index with the same ID (1010012, `MtilParser`), cropping each tile around its centre to the level's tile size (most maps' tiles have a 4-pixel border).
 - `VoiceoverExporter` slices from the first `OggS` marker.
 
 ## Cross-platform notes
