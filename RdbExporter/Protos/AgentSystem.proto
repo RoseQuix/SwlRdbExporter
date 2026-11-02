@@ -1,0 +1,102 @@
+// recovered from SecretWorldLegendsDX11.exe @ file offset 0x163bdf0
+syntax = "proto2";
+option csharp_namespace = "RdbExporter.Protos";
+
+message Trait {
+  optional int32 Id = 1;
+  optional int32 Category = 2;
+}
+
+message TraitCategory {
+  optional int32 Id = 1;
+}
+
+message Bonus {
+  optional int32 Id = 1;
+  optional int32 TemplateId = 2;
+}
+
+message SuccessLevel {
+  optional int32 Id = 1;
+  optional int32 Level = 2;
+}
+
+message ArcheType {
+  optional int32 Id = 1;
+}
+
+message ConsumableBonuses {
+  optional int32 TemplateId = 1;
+  optional Bonus Bonus = 2;
+}
+
+message TokenCost {
+  optional int32 TokenId = 1;
+  optional int32 Cost = 2;
+}
+
+message TraitBonuses {
+  optional TraitCategory TraitCategory = 1;
+  optional Bonus Bonus = 2;
+}
+
+message ItemRewards {
+  optional SuccessLevel SuccessLevel = 1;
+  optional int32 TemplateId = 2;
+}
+
+message XPRewards {
+  optional SuccessLevel SuccessLevel = 1;
+  optional int32 XPAmount = 2;
+}
+
+message AgentStat {
+  optional int32 Id = 1;
+  optional int32 MinValue = 2;
+  optional int32 MaxValue = 3;
+}
+
+message Agent {
+  optional int32 Id = 1;
+  optional int32 Level = 2;
+  optional int32 Rarity = 3;
+  repeated Trait Traits = 4;
+  optional int32 BonusBuffId = 5;
+  optional int32 BonusBuffSortCategory = 6;
+  repeated AgentStat Stats = 7;
+  optional int32 Fatigue = 8;
+  repeated ArcheType ArcheTypes = 9;
+  optional int32 Faction = 10;
+  optional int32 Order = 11;
+}
+
+message AgentList {
+  repeated Agent Agents = 1;
+}
+
+message AgentMission {
+  optional int32 Id = 1;
+  optional int32 Difficulty = 2;
+  optional int32 StarRating = 3;
+  optional int32 Rarity = 4;
+  optional int32 CycleTime = 5;
+  optional int32 CompletionTime = 6;
+  optional int32 CashCost = 7;
+  optional int32 LevelRequirement = 8;
+  optional int32 Stat1Requirement = 9;
+  optional int32 Stat2Requirement = 10;
+  optional int32 Stat3Requirement = 11;
+  repeated ItemRewards ItemRewards = 12;
+  repeated TokenCost TokenCost = 13;
+  repeated TraitBonuses TraitBonuses = 14;
+  repeated XPRewards XPRewards = 15;
+  repeated ConsumableBonuses ConsumableBonuses = 16;
+  repeated int32 EligibleFactions = 17;
+  optional int32 PreRequisite = 18;
+  repeated TokenCost TokenReward = 19;
+}
+
+message AgentMissionList {
+  repeated AgentMission Missions = 1;
+}
+

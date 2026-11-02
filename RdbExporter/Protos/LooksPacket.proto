@@ -1,0 +1,74 @@
+// recovered from SecretWorldLegendsDX11.exe @ file offset 0x163cbf8
+syntax = "proto2";
+option csharp_namespace = "RdbExporter.Protos";
+
+message LooksPacket {
+  enum Exclusivity {
+    NoExclusive = 0;
+    FullExclusive = 1;
+    BodyOnlyExclusive = 2;
+    UniqueExclusive = 4;
+  }
+  enum PackageType {
+    None = 0;
+    Character = 1;
+    Monster = 2;
+    CharacterCreation = 3;
+    ClothingItem = 4;
+    NPCHead = 5;
+  }
+  optional string Name = 1;
+  optional string Description = 2;
+  repeated LooksPacketConfiguration Configurations = 3;
+  optional int32 DefaultConfiguration = 4;
+  optional LooksPacket.Exclusivity Exclusive = 5;
+  optional LooksPacket.PackageType Type = 6;
+}
+
+message LooksPacketSlot {
+  optional uint32 RdbId = 1;
+  optional bool Tuck = 2;
+  optional int64 Tint1 = 3;
+  optional int64 Tint2 = 4;
+  optional int32 DecalU = 5;
+  optional int32 DecalV = 6;
+  optional LooksPacketSlot Parent = 7;
+  optional int32 BodyLocation = 8;
+  // Renamed from HasAttractorPlacement, which clashes with the C# presence property of AttractorPlacement.
+  optional bool HasAttractorPlacementFlag = 9 [json_name = "HasAttractorPlacement"];
+  optional int32 AttractorPlacement = 10;
+  optional bool ArmTuck = 11;
+  optional int64 TintMask1 = 12;
+  optional int64 TintMask2 = 13;
+  optional int64 TintMask3 = 14;
+  optional int64 TintMask4 = 15;
+  optional int64 TintMask5 = 16;
+  optional int64 TintMask6 = 17;
+  optional string Material = 18;
+  optional int32 RdbType = 19;
+  optional int32 TextureType = 20;
+  repeated LooksPacketMorphVector MorphVectors = 21;
+  optional string MaterialCriteria = 22;
+  optional int32 SlotType = 23;
+  optional int64 TintSpecularColor = 24;
+  optional bool SkinOverride = 25;
+}
+
+message LooksPacketConfiguration {
+  enum Availability {
+    CharacterCreation = 1;
+    FirstShop = 2;
+    NotForSale = 4;
+  }
+  optional int32 Id = 1;
+  repeated LooksPacketSlot Slots = 2;
+  optional uint32 Thumbnail = 3;
+  optional int32 Available = 4;
+  optional uint32 LockTagID = 5;
+}
+
+message LooksPacketMorphVector {
+  optional string GroupName = 1;
+  optional int32 GroupValue = 2;
+}
+

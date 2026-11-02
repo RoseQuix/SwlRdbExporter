@@ -238,5 +238,61 @@
     "isSwl": true,
     "id": 1010516,
     "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Lua Scripts",
+    "isSwl": true,
+    "id": 1010223,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "LuaScriptList" ]
+  },
+  {
+    "name": "Quest Givers",
+    "isSwl": true,
+    "id": 1000104,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "QuestGiverList" ]
+  },
+  {
+    "name": "Lore Tree",
+    "isSwl": true,
+    "id": 1000108,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "LoreTreeBuf" ]
+  },
+  {
+    "name": "Looks Packages",
+    "isSwl": true,
+    "id": 1010226,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "LooksPacket" ]
+  },
+  {
+    "name": "Clothing Tree",
+    "isSwl": true,
+    "id": 1010231,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "ClothingNode" ]
+  },
+  {
+    "name": "Agents",
+    "isSwl": true,
+    "id": 1010240,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "AgentList" ]
+  },
+  {
+    "name": "Agent Missions",
+    "isSwl": true,
+    "id": 1010241,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "AgentMissionList" ]
+  },
+  {
+    "name": "Item Families",
+    "isSwl": true,
+    "id": 1065212,
+    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
+    "exporterArguments": [ "ItemFamilyList" ]
   }
 ]

@@ -1,0 +1,24 @@
+// recovered from SecretWorldLegendsDX11.exe @ file offset 0x1678a78
+syntax = "proto2";
+option csharp_namespace = "RdbExporter.Protos";
+
+message ClothingNode {
+  optional int32 Id = 1;
+  optional int32 MaleItemId = 2;
+  optional int32 FemaleItemId = 3;
+  optional int32 Color1 = 4;
+  optional int32 Color2 = 5;
+  optional int32 Color1TdbId = 6;
+  optional int32 Color2TdbId = 7;
+  optional int32 Icon1 = 8;
+  optional int32 Icon2 = 9;
+  optional int32 Price = 10;
+  optional int32 PriceTokenType = 11;
+  optional int32 Faction = 12;
+  optional bool HideWhenLocked = 13;
+  optional int32 FilterType = 14;
+  repeated ClothingNode Children = 15;
+  optional int32 NodeType = 16;
+  optional int32 FeaturedEvent = 17 [default = 0];
+}
+

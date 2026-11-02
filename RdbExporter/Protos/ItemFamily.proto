@@ -1,0 +1,15 @@
+// recovered from SecretWorldLegendsDX11.exe @ file offset 0x1678218
+syntax = "proto2";
+option csharp_namespace = "RdbExporter.Protos";
+
+message FamilyItem {
+  optional int32 FamilyId = 1;
+  optional int32 Rarity = 2;
+  optional int32 PipCount = 3;
+  optional int32 ItemTemplate = 4;
+}
+
+message ItemFamilyList {
+  repeated FamilyItem Family = 1;
+}
+
