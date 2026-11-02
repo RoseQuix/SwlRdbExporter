@@ -44,6 +44,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `LayoutExporter` decodes binary types with a layout function and writes JSON; `Arguments[0]` names the layout in `PlacementParser.Layouts` (per-playfield types) or `AssetParser.Layouts` (other small formats); with `Arguments[1]` = `KeepInnerHeader` the layout gets the entry with its inner header (`IDBRIndexEntrty.ReadAllBytes(dir, true)`). Layouts build dictionaries (field names from the notes), read through `Utilities/SpanReader` (throws `InvalidDataException` past the end) and must consume the whole entry.
 - `CollisionMeshExporter` writes per-object collision meshes (1010060, and the unused older 1010034) as OBJ in local space, one group per sub-mesh.
 - `CollisionTagMapExporter` writes collision tag maps (1066609; raw after `CTM1`, zlib after an inner header) as an 8-bit PNG of per-metre terrain layer slots plus JSON with the 256 footstep / occlusion tags.
+- `LayerHeightmapExporter` writes terrain layer height maps (1000069) as an 8-bit PNG of the top mip plus the baked BC5 normal map as `<id>_normal.dds`.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` stitches the largest level of each map (1010013) using the MTIL tile index with the same ID (1010012, `MtilParser`), cropping each tile around its centre to the level's tile size (most maps' tiles have a 4-pixel border).
 - `VoiceoverExporter` slices from the first `OggS` marker.

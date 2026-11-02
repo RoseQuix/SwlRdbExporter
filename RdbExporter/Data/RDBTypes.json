@@ -736,5 +736,12 @@
     "id": 1066609,
     "otherDesc": "CTM1: per-metre terrain layer slot as 8-bit PNG, footstep / occlusion tags as JSON.",
     "exporterType": "RdbExporter.Exporters.CollisionTagMapExporter"
+  },
+  {
+    "name": "Terrain Layer Height Maps",
+    "isSwl": true,
+    "id": 1000069,
+    "otherDesc": "Height as 8-bit PNG plus the baked BC5 normal map as DDS.",
+    "exporterType": "RdbExporter.Exporters.LayerHeightmapExporter"
   }
 ]
