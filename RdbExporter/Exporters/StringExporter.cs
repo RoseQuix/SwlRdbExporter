@@ -24,7 +24,11 @@ namespace RdbExporter.Exporters
             var indexEntries = Helpers.GetRdbIndex(parameters.SwlInstallDir);
             var stringEntries = indexEntries.Where(i => i.Type == 1030002).ToDictionary(i => i.Id);
 
-            var languageFiles = Directory.EnumerateFiles(Path.Combine(parameters.SwlInstallDir, @"Data\Text\"), "*.tdbl", SearchOption.TopDirectoryOnly).Select(TDL1Parser.ParseTDL1File).ToList();
+            //Linux installs may have the folder as "text", so match the name case-insensitively
+            var dataDirectory = Path.Combine(parameters.SwlInstallDir, "Data");
+            var textDirectory = Directory.EnumerateDirectories(dataDirectory).FirstOrDefault(d => string.Equals(Path.GetFileName(d), "Text", System.StringComparison.OrdinalIgnoreCase))
+                ?? Path.Combine(dataDirectory, "Text");
+            var languageFiles = Directory.EnumerateFiles(textDirectory, "*.tdbl", SearchOption.TopDirectoryOnly).Select(TDL1Parser.ParseTDL1File).ToList();
 
             var usedFiles = new HashSet<int>();
             foreach (var languageFile in languageFiles)
