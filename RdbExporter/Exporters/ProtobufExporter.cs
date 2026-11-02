@@ -10,7 +10,7 @@ namespace RdbExporter.Exporters
     /// <summary>
     /// Decodes protobuf entries to JSON with the schemas recovered from the client (Protos/*.proto).
     /// Arguments[0] is the message name, e.g. "LoreTreeBuf" or "LuaScriptList".
-    /// Some types mix formats (1000104 also holds XML), so entries that start with '&lt;' are written as .xml, and
+    /// Some types mix formats (1000104 also holds XML), so XML entries are written as .xml, and
     /// entries that don't parse as .dat.
     /// </summary>
     public class ProtobufExporter : IExporter
@@ -28,7 +28,7 @@ namespace RdbExporter.Exporters
             Parallel.ForEach(parameters.RdbFileEntries, entry =>
             {
                 var data = entry.ReadAllBytes(parameters.SwlInstallDir);
-                if (data.Length > 0 && data[0] == '<')
+                if (Helpers.LooksLikeXml(data))
                 {
                     File.WriteAllBytes(Helpers.GetOutputPath(parameters, entry, ".xml", true), data);
                     return;

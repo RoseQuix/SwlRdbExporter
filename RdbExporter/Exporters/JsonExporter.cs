@@ -31,7 +31,14 @@ namespace RdbExporter.Exporters
             {
                 try
                 {
-                    var value = Parse(parameters, entry, entry.ReadAllBytes(parameters.SwlInstallDir));
+                    var data = entry.ReadAllBytes(parameters.SwlInstallDir);
+                    if (Helpers.LooksLikeXml(data))
+                    {
+                        //A few binary types also hold misfiled XML sources
+                        File.WriteAllBytes(Helpers.GetOutputPath(parameters, entry, ".xml", true), data);
+                        return;
+                    }
+                    var value = Parse(parameters, entry, data);
                     File.WriteAllText(Helpers.GetOutputPath(parameters, entry, ".json", true), JsonSerializer.Serialize(value, JsonOptions));
                 }
                 catch (InvalidDataException e)

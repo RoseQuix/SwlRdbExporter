@@ -46,6 +46,14 @@ namespace RdbExporter.Utilities
         }
 
         /// <summary>
+        /// Whether an entry is an XML document ("&lt;?" or "&lt;" and a letter), as some binary types also hold XML sources.
+        /// </summary>
+        public static bool LooksLikeXml(byte[] data)
+        {
+            return data.Length > 1 && data[0] == '<' && (data[1] == '?' || char.IsAsciiLetter((char)data[1]));
+        }
+
+        /// <summary>
         /// Name of the folder a type is exported to, e.g. "1010004 - Textures".
         /// </summary>
         public static string GetExportDirectoryName(RdbType rdbType)

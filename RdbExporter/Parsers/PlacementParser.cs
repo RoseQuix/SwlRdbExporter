@@ -18,6 +18,7 @@ namespace RdbExporter.Parsers
         {
             ["Lights"] = Lights,
             ["Dynels"] = Dynels,
+            ["Particles"] = Particles,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -152,6 +153,28 @@ namespace RdbExporter.Parsers
                 records.Add(dynel);
             }
             return new { Dynels = records };
+        }
+
+        /// <summary>
+        /// Particle effect placements (1000058, GameData::PlayfieldEffects_c), id = playfield or playfield | 0x40000000.
+        /// u32 count, then count × {string name; u32 effect (1010207); f32 position[3]; f32 rotation[4] (x, y, z, w); f32 scale}
+        /// </summary>
+        private static object Particles(SpanReader r, NameLookup name)
+        {
+            var count = r.U32();
+            var records = new List<Dictionary<string, object>>();
+            for (var i = 0; i < count; i++)
+            {
+                var placement = new Dictionary<string, object> { ["Name"] = BinaryStreamString(r) };
+                var effect = r.U32();
+                placement["Effect"] = effect;
+                placement["EffectName"] = name(1010207, effect);
+                placement["Position"] = r.F32s(3);
+                placement["Rotation"] = r.F32s(4);
+                placement["Scale"] = r.F32();
+                records.Add(placement);
+            }
+            return new { Effects = records };
         }
 
         /// <summary>u16 n, char[n]; n = 0xffff is followed by u16 0x1ff and a u32 length (BinaryStream::ReadString).</summary>

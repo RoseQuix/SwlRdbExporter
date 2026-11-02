@@ -608,5 +608,12 @@
     "id": 1000057,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "Dynels" ]
+  },
+  {
+    "name": "Particle Effect Placements",
+    "isSwl": true,
+    "id": 1000058,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "Particles" ]
   }
 ]
