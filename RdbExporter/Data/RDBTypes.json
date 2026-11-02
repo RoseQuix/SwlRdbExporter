@@ -572,5 +572,21 @@
     "otherDesc": "MTIL; the Maps export uses these to lay out its tiles.",
     "exporterType": "RdbExporter.Exporters.RawFileExporter",
     "exporterArguments": [ ".mtil" ]
+  },
+  {
+    "name": "Ambient Occlusion Textures",
+    "isSwl": true,
+    "id": 1010043,
+    "otherDesc": "FAOGen AO atlases as 8-bit PNG (255 = unoccluded).",
+    "exporterType": "RdbExporter.Exporters.RasterExporter",
+    "exporterArguments": [ "R8" ]
+  },
+  {
+    "name": "Rain Snow Masks",
+    "isSwl": true,
+    "id": 1066611,
+    "otherDesc": "Per-playfield occluder heights as PFM (float) images.",
+    "exporterType": "RdbExporter.Exporters.RasterExporter",
+    "exporterArguments": [ "R32F" ]
   }
 ]

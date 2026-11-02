@@ -39,6 +39,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `ItemTemplateExporter` / `ItemTemplateParser` decode item (1000620) and spell (1000621) templates. Some entries store string lengths in UTF-16 units (a bug in Funcom's export tool); the parser backtracks over the possible readings and records them in `StringReadings`.
 - `DataTableExporter` / `DataTableParser` decode the 42 small one-entry tables (feats, hair, playfield parents, XP, tokens, game tweaks, login rewards, …), one layout function per type. Columns without a known meaning are written as `Values` arrays.
 - `HeightmapExporter` writes GHM1 heightmaps (1066604) as 16-bit greyscale PNG through `Utilities/PngWriter` (SkiaSharp can't encode 16-bit grey), with a JSON sidecar holding the scale.
+- `RasterExporter` writes the {u32 version, u32 width, u32 height} + texels rasters: `R8` (FAOGen AO textures, 1010043) as 8-bit PNG, `R32F` (rain/snow occluder heights, 1066611) as PFM.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` stitches the largest level of each map (1010013) using the MTIL tile index with the same ID (1010012, `MtilParser`), cropping each tile around its centre to the level's tile size (most maps' tiles have a 4-pixel border).
 - `VoiceoverExporter` slices from the first `OggS` marker.
