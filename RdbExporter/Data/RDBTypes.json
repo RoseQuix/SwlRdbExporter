@@ -636,5 +636,12 @@
     "id": 1000059,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "EnvironmentAreas" ]
+  },
+  {
+    "name": "Doors",
+    "isSwl": true,
+    "id": 1000102,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "Doors" ]
   }
 ]

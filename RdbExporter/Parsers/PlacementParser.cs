@@ -22,6 +22,7 @@ namespace RdbExporter.Parsers
             ["ScryScripts"] = ScryScripts,
             ["SensorVolumes"] = SensorVolumes,
             ["EnvironmentAreas"] = EnvironmentAreas,
+            ["Doors"] = Doors,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -279,6 +280,35 @@ namespace RdbExporter.Parsers
                 areas.Add(area);
             }
             return new { Areas = areas };
+        }
+
+        /// <summary>
+        /// Doors (1000102, GameData::PlayfieldDoors_c), no inner header. u32 version, u32 count, then count records:
+        ///   u16 n, name; u32 object (a game object of type 55000); u16 n, label; u8 flag; u32 a; f32 b;
+        ///   f32 position[3]; f32 rotation[4] (x, y, z, w); f32 box[6] (min, max); u32 c, d
+        /// </summary>
+        private static object Doors(SpanReader r, NameLookup name)
+        {
+            var version = r.U32();
+            var doors = new List<object>();
+            for (var count = r.U32(); count > 0; count--)
+            {
+                doors.Add(new
+                {
+                    Name = r.Latin1(r.U16()),
+                    Object = r.U32(),
+                    Label = r.Latin1(r.U16()),
+                    Flag = r.U8(),
+                    A = r.U32(),
+                    B = r.F32(),
+                    Position = r.F32s(3),
+                    Rotation = r.F32s(4),
+                    Box = r.F32s(6),
+                    C = r.U32(),
+                    D = r.U32(),
+                });
+            }
+            return new { Version = version, Doors = doors };
         }
 
         /// <summary>BoxCluster_t: array children, f32 box[6], u8 isLeaf, [isLeaf] u32 index.</summary>
