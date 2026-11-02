@@ -9,12 +9,15 @@ namespace RdbExporter.Exporters
 {
     /// <summary>
     /// Binary types decoded by a layout function, written as JSON. Arguments[0] names the layout, from
-    /// PlacementParser.Layouts (per-playfield types) or AssetParser.Layouts (other small formats).
+    /// PlacementParser.Layouts (per-playfield types) or AssetParser.Layouts (other small formats). If Arguments[1] is
+    /// "KeepInnerHeader", the layout reads the inner header {type, id, version} itself (where there is one).
     /// </summary>
     public class LayoutExporter : JsonExporter
     {
         private static readonly Dictionary<string, Func<SpanReader, LayoutNameLookup, object>> Layouts =
             PlacementParser.Layouts.Concat(AssetParser.Layouts).ToDictionary(kv => kv.Key, kv => kv.Value);
+
+        protected override bool KeepInnerHeader(ExportParameters parameters) => parameters.Arguments.Count > 1 && parameters.Arguments[1] == "KeepInnerHeader";
 
         protected override object Parse(ExportParameters parameters, IDBRIndexEntrty entry, byte[] data)
         {

@@ -722,5 +722,12 @@
     "id": 1010303,
     "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "GrassTextureToMesh" ]
+  },
+  {
+    "name": "Ground Descriptors",
+    "isSwl": true,
+    "id": 1066601,
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "GroundDescriptor", "KeepInnerHeader" ]
   }
 ]

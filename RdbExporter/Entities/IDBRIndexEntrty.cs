@@ -49,11 +49,17 @@ namespace RdbExporter.Entities
         }
 
         /// <summary>
-        /// Reads the entry's payload, without the optional 12-byte inner header.
+        /// Reads the entry's payload, without the optional 12-byte inner header {type, id, version} unless
+        /// <paramref name="keepInnerHeader"/> is set.
         /// </summary>
-        public byte[] ReadAllBytes(string installDir)
+        public byte[] ReadAllBytes(string installDir, bool keepInnerHeader = false)
         {
             using var reader = OpenEntryFile(installDir);
+            if (keepInnerHeader && _rawFileLength.HasValue)
+            {
+                reader.BaseStream.Seek(-12, SeekOrigin.Current);
+                return reader.ReadBytes(_rawFileLength.Value);
+            }
             return reader.ReadBytes(FileLength);
         }
     }

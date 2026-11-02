@@ -30,6 +30,7 @@ namespace RdbExporter.Parsers
             ["BoundedAreaScripts"] = BoundedAreaScripts,
             ["BoundedAreaReverb"] = BoundedAreaReverb,
             ["EnvironmentSettings"] = EnvironmentSettings,
+            ["GroundDescriptor"] = GroundDescriptor,
         };
 
         private static readonly string[] LightTypes = { null, "Point", "Spot", "RectArea" };
@@ -464,5 +465,67 @@ namespace RdbExporter.Parsers
 
         /// <summary>A name from <paramref name="names"/>, or the number itself if it's out of range.</summary>
         private static object Enum(string[] names, uint value) => value < names.Length && names[value] != null ? names[value] : value;
+
+        /// <summary>
+        /// Ground descriptors (1066601, GRND), id = playfield. Read with the inner header, whose version selects the layout.
+        ///   FUH {1066601, id, version}; ["GRND", u32 mode] (no magic: mode 0); u32 width, height (playfield size in
+        ///   LOD-0 chunks); f32 heightScale; mode 1: f32 unitsPerGridX, Z
+        ///   ceil(w / 4) × ceil(h / 4) × u32 1066606 colour map ids, one per 4 × 4-chunk block (the client reads at most 8 × 8)
+        ///   u32 texture (1066606 whole-playfield map); u32, f32 (dropped)
+        ///   mode 0: version 1: layers 0-255, else 256 × u32 layer table; &gt; 2: f32 fa; &gt;= 4: f32 fb, fc; &gt; 4: u32 u5
+        ///   mode 1: f32 fa (brush tiling); fa != 0: 256 × u32 layer table; f32 fb, fc
+        /// Layer table entries are terrain layer ids (1010006 diffuse / 1000096 normal / 1000069 height maps).
+        /// Bytes after that aren't read by the client and are only counted.
+        /// </summary>
+        private static object GroundDescriptor(SpanReader r, LayoutNameLookup name)
+        {
+            if (r.U32() != 1066601) throw new InvalidDataException("No inner header.");
+            var ground = new Dictionary<string, object> { ["Id"] = r.U32() };
+            var version = r.U32();
+            ground["Version"] = version;
+            var first = r.U32();
+            uint mode, width;
+            if (first == 0x444e5247) //"GRND"
+            {
+                mode = r.U32();
+                width = r.U32();
+            }
+            else
+            {
+                mode = 0;
+                width = first;
+            }
+            var height = r.U32();
+            ground["Mode"] = mode;
+            ground["Width"] = width;
+            ground["Height"] = height;
+            ground["HeightScale"] = r.F32();
+            if (mode == 1) ground["UnitsPerGrid"] = r.F32s(2);
+
+            int blocksX = (int)((width + 3) / 4), blocksY = (int)((height + 3) / 4);
+            var blocks = new List<uint[]>();
+            for (var y = 0; y < blocksY; y++) blocks.Add(r.U32s(blocksX));
+            ground["ColourMapBlocks"] = blocks;
+            ground["Texture"] = r.U32();
+            ground["u0"] = r.U32();
+            ground["f0"] = r.F32();
+            if (mode == 0)
+            {
+                ground["Layers"] = version == 1 ? Enumerable.Range(0, 256).Select(i => (uint)i).ToArray() : r.U32s(256);
+                if (version > 2) ground["fa"] = r.F32();
+                if (version >= 4) ground["fb_c"] = r.F32s(2);
+                if (version > 4) ground["u5"] = r.U32();
+            }
+            else
+            {
+                var fa = r.F32();
+                ground["fa"] = fa;
+                if (fa != 0) ground["Layers"] = r.U32s(256);
+                ground["fb_c"] = r.F32s(2);
+            }
+            ground["UnreadBytes"] = r.Remaining;
+            r.Bytes(r.Remaining);
+            return ground;
+        }
     }
 }
