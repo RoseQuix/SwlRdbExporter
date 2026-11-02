@@ -691,5 +691,12 @@
     "id": 1010034,
     "otherDesc": "Older single-mesh form of 1010060, never read by the client.",
     "exporterType": "RdbExporter.Exporters.CollisionMeshExporter"
+  },
+  {
+    "name": "Attractor Sets",
+    "isSwl": true,
+    "id": 1010031,
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "Attractors" ]
   }
 ]
