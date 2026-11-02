@@ -13,7 +13,7 @@ namespace RdbExporter.Parsers
     public static class MtilParser
     {
         public record Level(int Columns, int Rows, int TileWidth, int TileHeight, (int Offset, int Size)[] Tiles);
-        public record TileIndex(uint Version, List<Level> Levels);
+        public record TileIndex(uint Version, uint? Unknown, List<Level> Levels);
 
         public static TileIndex Parse(byte[] data)
         {
@@ -23,7 +23,7 @@ namespace RdbExporter.Parsers
             if (magic.SequenceEqual("MTI1"u8)) version = 1;
             else if (magic.SequenceEqual("MTIL"u8)) version = reader.ReadUInt32();
             else throw new InvalidDataException("Not an MTIL tile index.");
-            if (version > 1) reader.ReadUInt32();
+            uint? unknown = version > 1 ? reader.ReadUInt32() : null;
 
             var levelCount = reader.ReadInt32();
             var levels = new List<Level>();
@@ -42,7 +42,8 @@ namespace RdbExporter.Parsers
                 throw new InvalidDataException("MTIL tile index ends early.");
             }
             if (levels.Count == 0) throw new InvalidDataException("MTIL tile index has no levels.");
-            return new TileIndex(version, levels);
+            if (reader.BaseStream.Position != data.Length) throw new InvalidDataException("MTIL tile index has trailing data.");
+            return new TileIndex(version, unknown, levels);
         }
     }
 }

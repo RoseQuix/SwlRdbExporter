@@ -690,9 +690,8 @@
     "name": "Map Tile Indexes",
     "isSwl": true,
     "id": 1010012,
-    "otherDesc": "MTIL; the Maps export uses these to lay out its tiles.",
-    "exporterType": "RdbExporter.Exporters.RawFileExporter",
-    "exporterArguments": [ ".mtil" ]
+    "otherDesc": "MTIL as JSON: per level the tile grid and each tile's offset and size in the same-id 1010013 map; the Maps export uses these to lay out its tiles.",
+    "exporterType": "RdbExporter.Exporters.MtilExporter"
   },
   {
     "name": "Ambient Occlusion Textures",
