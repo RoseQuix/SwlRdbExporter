@@ -49,6 +49,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `WaterExporter` splits water data (1000054) into 16-bit PNGs of the four u16 cell fields, an RGB PFM of the foam coordinates, the portal mesh as OBJ and a JSON header.
 - `MorphExporter` decodes face morph targets (1010007) to JSON: decoded per-vertex offsets per submesh, plus bone records named via `Cat2Exporter.GetBoneNames`.
 - `ParticleEffectExporter` / `ParticleEffectParser` decode particle effects (1010207): zlib-compressed fastwire blobs read through spec tables (offset, name, kind) like the notes' `peffect.py`; a field exists when it fits in the record's stride, and every byte must belong to some record, array or string.
+- `PhysxExporter` / `PhysxParser` convert the per-playfield PhysX 3.2 collections (1000005) to a world-space OBJ of the static actors' triangle mesh and box shapes, one PFM per heightfield and JSON with the materials (bound by index to the same-id 1000637 material list) and heightfield placement. A static shape's stored pose is already its world pose, so the actor pose isn't applied on top.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` stitches the largest level of each map (1010013) using the MTIL tile index with the same ID (1010012, `MtilParser`), cropping each tile around its centre to the level's tile size (most maps' tiles have a 4-pixel border).
 - `VoiceoverExporter` slices from the first `OggS` marker.

@@ -20,6 +20,7 @@ namespace RdbExporter.Parsers
             ["OldPlayfield"] = OldPlayfield,
             ["TextureDescriptor"] = TextureDescriptor,
             ["AoAtlas"] = AoAtlas,
+            ["PhysicsMaterialList"] = PhysicsMaterialList,
         };
 
         /// <summary>
@@ -276,6 +277,19 @@ namespace RdbExporter.Parsers
                 return new { Version = version, MeshGroups = meshGroups, Groups = groups, Meshes = meshes, Terrain = terrain };
             }
             throw new InvalidDataException($"Unsupported version {version}.");
+        }
+
+        /// <summary>
+        /// PhysX material lists (1000637, RDBPhysicsMaterialList), same id as the 1000005 collection; its i-th Material
+        /// binds to entry i. u8 version (1), u16 count, count × {u8 a (0-29), u8 b (0-6)}; meanings unconfirmed.
+        /// </summary>
+        private static object PhysicsMaterialList(SpanReader r, LayoutNameLookup name)
+        {
+            var version = r.U8();
+            if (version != 1) throw new InvalidDataException($"Unsupported version {version}.");
+            var entries = new List<int[]>();
+            for (var n = r.U16(); n > 0; n--) entries.Add(new int[] { r.U8(), r.U8() });
+            return new { Version = version, Entries = entries };
         }
     }
 }

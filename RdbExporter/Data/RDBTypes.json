@@ -690,6 +690,21 @@
     "exporterType": "RdbExporter.Exporters.CollisionMeshExporter"
   },
   {
+    "name": "Physics Collections",
+    "isSwl": true,
+    "id": 1000005,
+    "otherDesc": "Per-playfield PhysX 3.2 static collision as world-space OBJ, heightfield PFMs and JSON.",
+    "exporterType": "RdbExporter.Exporters.PhysxExporter"
+  },
+  {
+    "name": "Physics Material Lists",
+    "isSwl": true,
+    "id": 1000637,
+    "otherDesc": "Surface values the 1000005 collection's materials bind to.",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "PhysicsMaterialList" ]
+  },
+  {
     "name": "Old Collision Meshes",
     "id": 1010034,
     "otherDesc": "Older single-mesh form of 1010060, never read by the client.",
