@@ -18,6 +18,7 @@ namespace RdbExporter.Parsers
             ["GrassTextureToMesh"] = GrassTextureToMesh,
             ["SoundSet"] = SoundSet,
             ["OldPlayfield"] = OldPlayfield,
+            ["TextureDescriptor"] = TextureDescriptor,
         };
 
         /// <summary>
@@ -187,6 +188,19 @@ namespace RdbExporter.Parsers
             playfield["Block"] = Convert.ToHexString(r.Bytes(56));
             playfield["Tail"] = Convert.ToHexString(r.Bytes((int)r.U32()));
             return playfield;
+        }
+
+        /// <summary>
+        /// Texture descriptors (1010040, never read by the client; field names are guesses). u32 version (1), u16 width,
+        /// u16 height, u8 mip count, u8 slot count, then slots × {u32 id, i32, u32, u8 slot, u8 flag}. No slot id exists.
+        /// </summary>
+        private static object TextureDescriptor(SpanReader r, LayoutNameLookup name)
+        {
+            var descriptor = new Dictionary<string, object> { ["Version"] = r.U32(), ["Width"] = r.U16(), ["Height"] = r.U16(), ["Mips"] = r.U8() };
+            var slots = new List<object>();
+            for (var count = r.U8(); count > 0; count--) slots.Add(new { Id = r.U32(), A = r.I32(), B = r.U32(), Slot = r.U8(), Flag = r.U8() });
+            descriptor["Slots"] = slots;
+            return descriptor;
         }
     }
 }
