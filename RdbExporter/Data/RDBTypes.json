@@ -1073,5 +1073,45 @@
     "otherDesc": "4 bytes of protobuf, {1: 1, 3: 0}; never requested by the client.",
     "exporterType": "RdbExporter.Exporters.ProtobufExporter",
     "exporterArguments": [ "VersionedValue" ]
+  },
+  {
+    "name": "Language Files",
+    "isSwl": true,
+    "id": 1030001,
+    "otherDesc": "TDL1, the same format as Data/text/*.tdbl.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".tdbl" ]
+  },
+  {
+    "name": "Unused Sensor Volumes",
+    "isSwl": true,
+    "id": 1000048,
+    "otherDesc": "RDBPlayfieldSensorVolumesData, per playfield; every entry is a lone version 0 and the client never requests them.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".dat" ]
+  },
+  {
+    "name": "Grass Meshes",
+    "isSwl": true,
+    "id": 1010221,
+    "otherDesc": "GMSH (RDBGrassMesh_c), format not decoded; one more is misfiled in 1010217.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".gmsh" ]
+  },
+  {
+    "name": "Filename Tries",
+    "isSwl": true,
+    "id": 1020004,
+    "otherDesc": "One Patricia trie per RDB type (the entry id), the client's name to id lookup. Keys can't be listed, so not decoded.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".dat" ]
+  },
+  {
+    "name": "Miscellaneous Image",
+    "isSwl": true,
+    "id": 1010213,
+    "otherDesc": "A single PNG.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".png" ]
   }
 ]
