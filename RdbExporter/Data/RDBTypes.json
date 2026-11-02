@@ -89,8 +89,11 @@
     "exporterArguments": [ ".png" ]
   },
   {
-    "name": "",
-    "id": 1020001
+    "name": "Sound Sets",
+    "isSwl": true,
+    "id": 1020001,
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "SoundSet" ]
   },
   {
     "name": "Sound Effects",

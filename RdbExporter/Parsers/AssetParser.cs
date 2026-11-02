@@ -16,6 +16,7 @@ namespace RdbExporter.Parsers
             ["MorphNames"] = MorphNames,
             ["GrassConfig"] = GrassConfig,
             ["GrassTextureToMesh"] = GrassTextureToMesh,
+            ["SoundSet"] = SoundSet,
         };
 
         /// <summary>
@@ -137,6 +138,18 @@ namespace RdbExporter.Parsers
                 rows.Add(new { Texture = texture, TextureName = name(1010217, (uint)texture), Mesh = r.I32(), Key = r.I32() });
             }
             return new { Version = version, Rows = rows };
+        }
+
+        /// <summary>
+        /// Sound sets (1020001, RDBSoundSet_c): pairs of {u32 sound (1020002), u32 flag (read but unused)} to the end.
+        /// None of the member sounds exists in this build.
+        /// </summary>
+        private static object SoundSet(SpanReader r, LayoutNameLookup name)
+        {
+            if (r.Remaining % 8 != 0) throw new InvalidDataException($"Size {r.Remaining} is not a multiple of 8.");
+            var members = new List<object>();
+            while (r.Remaining > 0) members.Add(new { Sound = r.U32(), Flag = r.U32() });
+            return new { Members = members };
         }
     }
 }
