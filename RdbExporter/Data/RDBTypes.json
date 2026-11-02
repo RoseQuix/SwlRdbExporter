@@ -588,5 +588,11 @@
     "otherDesc": "Per-playfield occluder heights as PFM (float) images.",
     "exporterType": "RdbExporter.Exporters.RasterExporter",
     "exporterArguments": [ "R32F" ]
+  },
+  {
+    "name": "Static Mesh Placements",
+    "isSwl": true,
+    "id": 1000060,
+    "exporterType": "RdbExporter.Exporters.StatelsExporter"
   }
 ]

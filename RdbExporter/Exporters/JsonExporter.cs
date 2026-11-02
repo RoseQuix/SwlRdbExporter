@@ -23,7 +23,7 @@ namespace RdbExporter.Exporters
         };
 
         /// <summary>Decodes one entry's payload; throws InvalidDataException if it doesn't parse.</summary>
-        protected abstract object Parse(IDBRIndexEntrty entry, byte[] data);
+        protected abstract object Parse(ExportParameters parameters, IDBRIndexEntrty entry, byte[] data);
 
         public void RunExport(ExportParameters parameters)
         {
@@ -31,7 +31,7 @@ namespace RdbExporter.Exporters
             {
                 try
                 {
-                    var value = Parse(entry, entry.ReadAllBytes(parameters.SwlInstallDir));
+                    var value = Parse(parameters, entry, entry.ReadAllBytes(parameters.SwlInstallDir));
                     File.WriteAllText(Helpers.GetOutputPath(parameters, entry, ".json", true), JsonSerializer.Serialize(value, JsonOptions));
                 }
                 catch (InvalidDataException e)

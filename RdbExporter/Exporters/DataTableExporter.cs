@@ -8,6 +8,6 @@ namespace RdbExporter.Exporters
     /// </summary>
     public class DataTableExporter : JsonExporter
     {
-        protected override object Parse(IDBRIndexEntrty entry, byte[] data) => DataTableParser.Parse(entry.Type, data);
+        protected override object Parse(ExportParameters parameters, IDBRIndexEntrty entry, byte[] data) => DataTableParser.Parse(entry.Type, data);
     }
 }
