@@ -293,5 +293,17 @@
     "id": 1065212,
     "exporterType": "RdbExporter.Exporters.ProtobufExporter",
     "exporterArguments": [ "ItemFamilyList" ]
+  },
+  {
+    "name": "Item Templates",
+    "isSwl": true,
+    "id": 1000620,
+    "exporterType": "RdbExporter.Exporters.ItemTemplateExporter"
+  },
+  {
+    "name": "Spell Templates",
+    "isSwl": true,
+    "id": 1000621,
+    "exporterType": "RdbExporter.Exporters.ItemTemplateExporter"
   }
 ]

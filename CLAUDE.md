@@ -35,6 +35,8 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `ProtobufExporter` decodes protobuf types to JSON. `Arguments[0]` names the message; the classes are generated at build time (Grpc.Tools) from `Protos/*.proto`, schemas recovered from the client exe, with `option csharp_namespace = "RdbExporter.Protos"` added. `LooksPacket.proto`'s `HasAttractorPlacement` is renamed (keeping its JSON name) because it clashes with the generated presence property of `AttractorPlacement`.
 - `LuaScriptExporter` splits the Lua script list (1010223) into `ScriptID<id>.lua` files (the module name scripts `require`) plus `Index.json` with each script's source.
 - `MeshExporter` / `FmeParser` convert FME meshes (1010001) to OBJ (positions, normals, first UV set, one group per submesh) with an `.mtl` whose `map_Kd` / `map_Bump` point at `../1010004 - Textures/`, where the texture export writes the DDS files. Material parameters such as `g_DiffuseTex=0` index the submesh's texture list.
+- `JsonExporter` is the base for binary → JSON exporters: override `Parse(entry, data)` and throw `InvalidDataException` for entries that don't parse.
+- `ItemTemplateExporter` / `ItemTemplateParser` decode item (1000620) and spell (1000621) templates. Some entries store string lengths in UTF-16 units (a bug in Funcom's export tool); the parser backtracks over the possible readings and records them in `StringReadings`.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` splits concatenated JPEGs on `FF D9` and stitches map tiles using hard-coded grid-size detection, with a 7px overlap offset.
 - `VoiceoverExporter` slices from the first `OggS` marker.
