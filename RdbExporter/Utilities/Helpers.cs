@@ -46,6 +46,14 @@ namespace RdbExporter.Utilities
         }
 
         /// <summary>
+        /// Name of the folder a type is exported to, e.g. "1010004 - Textures".
+        /// </summary>
+        public static string GetExportDirectoryName(RdbType rdbType)
+        {
+            return string.IsNullOrWhiteSpace(rdbType.Name) ? rdbType.Id.ToString() : $"{rdbType.Id} - {rdbType.Name}";
+        }
+
+        /// <summary>
         /// Output path for an entry: its name from the filename index if it has one (with its extension changed to
         /// <paramref name="extension"/> if <paramref name="replaceNamedExtension"/> is set), otherwise its ID with <paramref name="extension"/>.
         /// Some names are shared by several IDs of a type, so those also get the ID appended.

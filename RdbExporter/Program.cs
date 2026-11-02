@@ -75,7 +75,7 @@ namespace RdbExporter
                     Arguments = rdbType.ExporterArguments,
                     SwlInstallDir = pathOption.Value(),
                     RdbFileEntries = rdbIndex.Where(i => i.Type == rdbType.Id).ToList(),
-                    ExportDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), string.IsNullOrWhiteSpace(rdbType.Name) ? rdbType.Id.ToString() : $"{rdbType.Id} - {rdbType.Name}")).FullName
+                    ExportDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), Helpers.GetExportDirectoryName(rdbType))).FullName
                 };
                 
                 if (exportParameters.RdbFileEntries.Count == 0)

@@ -124,11 +124,11 @@
     "exporterType": "RdbExporter.Exporters.FileNamesExporter"
   },
   {
-    "name": "FME Files",
-    "id": 1000010,
-    "exporterType": "RdbExporter.Exporters.RawFileExporter",
-    "otherDesc": "Warning: This export is extremely large (~10GB).",
-    "exporterArguments": [ ".fme" ]
+    "name": "Meshes",
+    "isSwl": true,
+    "id": 1010001,
+    "exporterType": "RdbExporter.Exporters.MeshExporter",
+    "otherDesc": "FME converted to OBJ. Warning: This export is extremely large (~20GB)."
   },
   {
     "name": "PhysX XML",
