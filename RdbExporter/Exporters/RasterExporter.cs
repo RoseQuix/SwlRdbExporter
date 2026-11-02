@@ -2,7 +2,7 @@ using RdbExporter.Entities;
 using RdbExporter.Utilities;
 using System;
 using System.IO;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace RdbExporter.Exporters
@@ -33,23 +33,13 @@ namespace RdbExporter.Exporters
                 using var output = File.Create(Helpers.GetOutputPath(parameters, entry, isFloat ? ".pfm" : ".png", true));
                 if (isFloat)
                 {
-                    WritePfm(output, width, height, data.AsSpan(12));
+                    PfmWriter.Write(output, width, height, 1, MemoryMarshal.Cast<byte, float>(data.AsSpan(12)));
                 }
                 else
                 {
                     PngWriter.WriteGray8(output, width, height, data.AsSpan(12));
                 }
             });
-        }
-
-        /// <summary>Greyscale PFM: "Pf", size, -1 (little-endian), then the rows bottom to top.</summary>
-        private static void WritePfm(Stream output, int width, int height, ReadOnlySpan<byte> texels)
-        {
-            output.Write(Encoding.ASCII.GetBytes($"Pf\n{width} {height}\n-1.0\n"));
-            for (var y = height - 1; y >= 0; y--)
-            {
-                output.Write(texels.Slice(y * width * 4, width * 4));
-            }
         }
     }
 }
