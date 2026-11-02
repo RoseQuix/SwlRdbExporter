@@ -22,6 +22,9 @@ namespace RdbExporter.Exporters
             NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
         };
 
+        /// <summary>Serializer options; indented by default.</summary>
+        protected virtual JsonSerializerOptions GetOptions(ExportParameters parameters) => JsonOptions;
+
         /// <summary>Whether Parse gets the entry with its inner header {type, id, version}, if it has one.</summary>
         protected virtual bool KeepInnerHeader(ExportParameters parameters) => false;
 
@@ -42,7 +45,7 @@ namespace RdbExporter.Exporters
                         return;
                     }
                     var value = Parse(parameters, entry, data);
-                    File.WriteAllText(Helpers.GetOutputPath(parameters, entry, ".json", true), JsonSerializer.Serialize(value, JsonOptions));
+                    File.WriteAllText(Helpers.GetOutputPath(parameters, entry, ".json", true), JsonSerializer.Serialize(value, GetOptions(parameters)));
                 }
                 catch (InvalidDataException e)
                 {

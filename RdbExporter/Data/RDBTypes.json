@@ -743,5 +743,21 @@
     "id": 1000069,
     "otherDesc": "Height as 8-bit PNG plus the baked BC5 normal map as DDS.",
     "exporterType": "RdbExporter.Exporters.LayerHeightmapExporter"
+  },
+  {
+    "name": "Skeletons",
+    "isSwl": true,
+    "id": 1010002,
+    "otherDesc": "CAT2 .cs skeletons as JSON.",
+    "exporterType": "RdbExporter.Exporters.Cat2Exporter",
+    "exporterArguments": [ "Skeleton" ]
+  },
+  {
+    "name": "Animations",
+    "isSwl": true,
+    "id": 1010003,
+    "otherDesc": "CAT2 .ca animations as JSON. Warning: This export is large (~10GB).",
+    "exporterType": "RdbExporter.Exporters.Cat2Exporter",
+    "exporterArguments": [ "Animation" ]
   }
 ]
