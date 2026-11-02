@@ -20,6 +20,7 @@ namespace RdbExporter.Parsers
             ["Dynels"] = Dynels,
             ["Particles"] = Particles,
             ["ScryScripts"] = ScryScripts,
+            ["SensorVolumes"] = SensorVolumes,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -213,6 +214,53 @@ namespace RdbExporter.Parsers
             var length = r.U16();
             if (length > 10000) throw new InvalidDataException($"Invalid string length {length}.");
             return r.Latin1(length);
+        }
+
+        /// <summary>
+        /// Sensor volumes (1000055, RDBPlayfieldSensorVolumesData). Array counts are BinaryStream counts.
+        ///   u32 version (1); u8 flag
+        ///   array volumes {u32 id (ScryScript index &lt;&lt; 16 | index); array f32[3] points; array faces (array u32 point
+        ///     indices); string name}
+        ///   array {u32 key, u32 value}; array {string name, u32 value}; BoxCluster tree over the volumes
+        /// </summary>
+        private static object SensorVolumes(SpanReader r, NameLookup name)
+        {
+            var version = r.U32();
+            if (version != 1) throw new InvalidDataException($"Unsupported version {version}.");
+            var flag = r.U8();
+            var volumes = new List<object>();
+            for (var i = BinaryStreamCount(r, 30000); i > 0; i--)
+            {
+                var id = r.U32();
+                var points = new List<float[]>();
+                for (var k = BinaryStreamCount(r, 30000); k > 0; k--) points.Add(r.F32s(3));
+                var faces = new List<uint[]>();
+                for (var k = BinaryStreamCount(r, 30000); k > 0; k--) faces.Add(r.U32s(BinaryStreamCount(r, 30000)));
+                volumes.Add(new { Id = id, Name = BinaryStreamString(r), Points = points, Faces = faces });
+            }
+            var map = new List<uint[]>();
+            for (var i = BinaryStreamCount(r, 1000000); i > 0; i--) map.Add(r.U32s(2));
+            var names = new List<object>();
+            for (var i = BinaryStreamCount(r, 1000000); i > 0; i--) names.Add(new { Name = BinaryStreamString(r), Value = r.U32() });
+            return new { Version = version, Flag = flag, Volumes = volumes, Map = map, Names = names, Tree = BoxCluster(r) };
+        }
+
+        /// <summary>BoxCluster_t: array children, f32 box[6], u8 isLeaf, [isLeaf] u32 index.</summary>
+        private static object BoxCluster(SpanReader r)
+        {
+            var children = new List<object>();
+            for (var i = BinaryStreamCount(r, 30000); i > 0; i--) children.Add(BoxCluster(r));
+            var box = r.F32s(6);
+            uint? leaf = r.U8() != 0 ? r.U32() : null;
+            return new { Box = box, Leaf = leaf, Children = children };
+        }
+
+        /// <summary>BinaryStream array count, stored as (n + 1) × 1009.</summary>
+        private static int BinaryStreamCount(SpanReader r, int limit)
+        {
+            var word = r.U32();
+            if (word % 1009 != 0 || word / 1009 < 1 || word / 1009 - 1 > limit) throw new InvalidDataException($"Bad count word 0x{word:x} at 0x{r.Position - 4:x}.");
+            return (int)(word / 1009 - 1);
         }
 
         /// <summary>u16 n, char[n]; n = 0xffff is followed by u16 0x1ff and a u32 length (BinaryStream::ReadString).</summary>

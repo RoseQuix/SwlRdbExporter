@@ -622,5 +622,12 @@
     "id": 1000504,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "ScryScripts" ]
+  },
+  {
+    "name": "Sensor Volumes",
+    "isSwl": true,
+    "id": 1000055,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "SensorVolumes" ]
   }
 ]
