@@ -310,6 +310,20 @@
     "exporterType": "RdbExporter.Exporters.ItemTemplateExporter"
   },
   {
+    "name": "Old Spell Templates",
+    "isSwl": true,
+    "id": 1040005,
+    "otherDesc": "Old-format spell templates, the fallback for 1000621.",
+    "exporterType": "RdbExporter.Exporters.OldTemplateExporter"
+  },
+  {
+    "name": "Old Item Templates",
+    "isSwl": true,
+    "id": 1000020,
+    "otherDesc": "Old-format item templates, the fallback for 1000620; most are TEA-encrypted (RDBH), written as their header.",
+    "exporterType": "RdbExporter.Exporters.OldTemplateExporter"
+  },
+  {
     "name": "Feats",
     "isSwl": true,
     "id": 1000042,

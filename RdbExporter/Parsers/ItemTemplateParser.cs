@@ -33,7 +33,7 @@ namespace RdbExporter.Parsers
             (103, 1138, 12), (116, 1150, 4), (120, 1163, 5), (125, 1159, 2), (127, 1162, 1), (128, 1168, 13),
             (150, 1181, 19), (169, 1201, 86),
         };
-        private static readonly Dictionary<uint, uint> V5Stats = V5StatRuns
+        internal static readonly Dictionary<uint, uint> V5Stats = V5StatRuns
             .SelectMany(r => Enumerable.Range(0, r.Count).Select(k => (Index: (uint)(r.Index + k), Stat: (uint)(r.Stat + k))))
             .ToDictionary(x => x.Index, x => x.Stat);
 
