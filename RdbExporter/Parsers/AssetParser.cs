@@ -17,6 +17,7 @@ namespace RdbExporter.Parsers
             ["GrassConfig"] = GrassConfig,
             ["GrassTextureToMesh"] = GrassTextureToMesh,
             ["SoundSet"] = SoundSet,
+            ["OldPlayfield"] = OldPlayfield,
         };
 
         /// <summary>
@@ -150,6 +151,42 @@ namespace RdbExporter.Parsers
             var members = new List<object>();
             while (r.Remaining > 0) members.Add(new { Sound = r.U32(), Flag = r.U32() });
             return new { Members = members };
+        }
+
+        /// <summary>
+        /// Old Age of Conan playfield descriptors (1000001, never read by SWL; field names are guesses from the data).
+        ///   u32 version (9-14), u32 id; v9: char name[32]; else u32 flag, str name, str author
+        ///   &gt;= 11: u32 sizeX, sizeZ (metres); &gt;= 12: i32 refA; u32 refB, cellSize, cellCount; &gt;= 12: str date;
+        ///   &gt;= 14: f32[4]; cellCount × u32 cells; 56 bytes; u32 n, n bytes. str = u32 n, char[n].
+        /// </summary>
+        private static object OldPlayfield(SpanReader r, LayoutNameLookup name)
+        {
+            var version = r.U32();
+            if (version < 9 || version > 14) throw new InvalidDataException($"Unsupported version {version}.");
+            var playfield = new Dictionary<string, object> { ["Version"] = version, ["Id"] = r.U32() };
+            if (version == 9)
+            {
+                var raw = r.Latin1(32);
+                playfield["Name"] = raw.Split('\0')[0];
+            }
+            else
+            {
+                playfield["Flag"] = r.U32();
+                playfield["Name"] = r.Latin1((int)r.U32());
+                playfield["Author"] = r.Latin1((int)r.U32());
+            }
+            if (version >= 11) playfield["Size"] = r.U32s(2);
+            if (version >= 12) playfield["RefA"] = r.I32();
+            playfield["RefB"] = r.U32();
+            playfield["CellSize"] = r.U32();
+            var cellCount = r.U32();
+            if (cellCount > 1 << 20) throw new InvalidDataException($"Cell count {cellCount}.");
+            if (version >= 12) playfield["Date"] = r.Latin1((int)r.U32());
+            if (version >= 14) playfield["f"] = r.F32s(4);
+            playfield["Cells"] = r.U32s((int)cellCount);
+            playfield["Block"] = Convert.ToHexString(r.Bytes(56));
+            playfield["Tail"] = Convert.ToHexString(r.Bytes((int)r.U32()));
+            return playfield;
         }
     }
 }

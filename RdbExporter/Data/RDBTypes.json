@@ -765,5 +765,12 @@
     "id": 1010036,
     "otherDesc": ".enl meshes as OBJ; never read by the client.",
     "exporterType": "RdbExporter.Exporters.EnlMeshExporter"
+  },
+  {
+    "name": "Old Playfield Descriptors",
+    "id": 1000001,
+    "otherDesc": "Age of Conan editor playfield descriptors, never read by SWL.",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "OldPlayfield" ]
   }
 ]
