@@ -725,6 +725,18 @@
     "exporterType": "RdbExporter.Exporters.CollisionMeshExporter"
   },
   {
+    "name": "Water Surface KD Trees",
+    "id": 1000015,
+    "otherDesc": "Per-playfield water surface triangles (KDv2) as OBJ, never loaded by the client.",
+    "exporterType": "RdbExporter.Exporters.KdTreeExporter"
+  },
+  {
+    "name": "Collision KD Trees",
+    "id": 1000028,
+    "otherDesc": "Per-object collision triangles (KDv2, same ids as 1010060) as OBJ, never loaded by the client.",
+    "exporterType": "RdbExporter.Exporters.KdTreeExporter"
+  },
+  {
     "name": "Attractor Sets",
     "isSwl": true,
     "id": 1010031,
