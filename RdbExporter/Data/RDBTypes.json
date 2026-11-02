@@ -794,5 +794,12 @@
     "id": 1000054,
     "otherDesc": "Per-playfield shore mask / foam grids as PNG and PFM, portal mesh as OBJ.",
     "exporterType": "RdbExporter.Exporters.WaterExporter"
+  },
+  {
+    "name": "Morph Files",
+    "isSwl": true,
+    "id": 1010007,
+    "otherDesc": "Character-creator face morph targets as JSON (per-vertex offsets per submesh).",
+    "exporterType": "RdbExporter.Exporters.MorphExporter"
   }
 ]

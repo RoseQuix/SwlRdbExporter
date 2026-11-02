@@ -38,7 +38,8 @@ namespace RdbExporter.Exporters
             return animation;
         }
 
-        private static Dictionary<uint, string> GetBoneNames(string installDir)
+        /// <summary>Bone name by FNV-1 hash, from every skeleton.</summary>
+        public static Dictionary<uint, string> GetBoneNames(string installDir)
         {
             lock (BoneNamesLock)
             {
