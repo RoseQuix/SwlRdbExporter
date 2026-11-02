@@ -615,5 +615,12 @@
     "id": 1000058,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "Particles" ]
+  },
+  {
+    "name": "ScryScript Placements",
+    "isSwl": true,
+    "id": 1000504,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "ScryScripts" ]
   }
 ]

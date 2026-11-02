@@ -19,6 +19,7 @@ namespace RdbExporter.Parsers
             ["Lights"] = Lights,
             ["Dynels"] = Dynels,
             ["Particles"] = Particles,
+            ["ScryScripts"] = ScryScripts,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -175,6 +176,43 @@ namespace RdbExporter.Parsers
                 records.Add(placement);
             }
             return new { Effects = records };
+        }
+
+        /// <summary>
+        /// ScryScripts (1000504, ScryScriptsData_c). u32 version (1-3), u32 count, then count records:
+        ///   f32 position[3] (all zero: none); u32 script (1010028 script group); &gt;= 2: u32 activation radius in metres
+        ///   (version 1: 70); &gt;= 3: u32 instance id; u16 n, name; u16 n, description; u16 count × {u16 n, name; u16 n, value}
+        /// </summary>
+        private static object ScryScripts(SpanReader r, NameLookup name)
+        {
+            var version = r.U32();
+            if (version < 1 || version > 3) throw new InvalidDataException($"Unsupported version {version}.");
+            var count = r.U32();
+            var records = new List<Dictionary<string, object>>();
+            for (var i = 0; i < count; i++)
+            {
+                var script = new Dictionary<string, object> { ["Position"] = r.F32s(3) };
+                var scriptId = r.U32();
+                script["Script"] = scriptId;
+                script["ScriptName"] = name(1010028, scriptId);
+                script["Range"] = version >= 2 ? r.U32() : 70u;
+                script["Instance"] = version >= 3 ? r.U32() : 0u;
+                script["Name"] = ShortString(r);
+                script["Description"] = ShortString(r);
+                var variables = new List<object>();
+                for (var v = r.U16(); v > 0; v--) variables.Add(new { Name = ShortString(r), Value = ShortString(r) });
+                script["Variables"] = variables;
+                records.Add(script);
+            }
+            return new { Version = version, Scripts = records };
+        }
+
+        /// <summary>u16 n (at most 10000), char[n].</summary>
+        private static string ShortString(SpanReader r)
+        {
+            var length = r.U16();
+            if (length > 10000) throw new InvalidDataException($"Invalid string length {length}.");
+            return r.Latin1(length);
         }
 
         /// <summary>u16 n, char[n]; n = 0xffff is followed by u16 0x1ff and a u32 length (BinaryStream::ReadString).</summary>
