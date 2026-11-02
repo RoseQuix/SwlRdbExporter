@@ -678,5 +678,18 @@
     "id": 1060668,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "EnvironmentSettings" ]
+  },
+  {
+    "name": "Collision Meshes",
+    "isSwl": true,
+    "id": 1010060,
+    "otherDesc": "Per-object collision meshes as OBJ (local space).",
+    "exporterType": "RdbExporter.Exporters.CollisionMeshExporter"
+  },
+  {
+    "name": "Old Collision Meshes",
+    "id": 1010034,
+    "otherDesc": "Older single-mesh form of 1010060, never read by the client.",
+    "exporterType": "RdbExporter.Exporters.CollisionMeshExporter"
   }
 ]
