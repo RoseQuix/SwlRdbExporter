@@ -17,6 +17,7 @@ namespace RdbExporter.Parsers
         public static readonly Dictionary<string, Func<SpanReader, NameLookup, object>> Layouts = new()
         {
             ["Lights"] = Lights,
+            ["Dynels"] = Dynels,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -111,6 +112,59 @@ namespace RdbExporter.Parsers
                 records.Add(light);
             }
             return new { Version = version, Lights = records };
+        }
+
+        /// <summary>
+        /// Simple dynels (1000057, GameData::PlayfieldSimpleDynels_c). u32 count, then count records:
+        ///   i32 version (1-4; 0 or less: nothing more)
+        ///   string name; f32 position[3]; f32 rotation[4] (x, y, z, w); f32 scale; u32 index (-1: none);
+        ///   u32 visualType, visualId; &gt;= 2: f32 bounds[6] (local min xyz, max xyz); &gt;= 3: u32 object id (a game
+        ///   object of type 55000); &gt;= 4: u8 flag; string tag (4 characters)
+        /// </summary>
+        private static object Dynels(SpanReader r, NameLookup name)
+        {
+            var count = r.U32();
+            var records = new List<Dictionary<string, object>>();
+            for (var i = 0; i < count; i++)
+            {
+                var version = r.I32();
+                var dynel = new Dictionary<string, object> { ["Version"] = version };
+                if (version > 0)
+                {
+                    dynel["Name"] = BinaryStreamString(r);
+                    dynel["Position"] = r.F32s(3);
+                    dynel["Rotation"] = r.F32s(4);
+                    dynel["Scale"] = r.F32();
+                    dynel["Index"] = r.I32();
+                    var visualType = r.U32();
+                    var visualId = r.U32();
+                    dynel["VisualType"] = visualType;
+                    dynel["VisualId"] = visualId;
+                    dynel["VisualName"] = name(visualType, visualId);
+                    if (version >= 2) dynel["Bounds"] = r.F32s(6);
+                    if (version >= 3) dynel["Object"] = r.U32();
+                    if (version >= 4)
+                    {
+                        dynel["Flag"] = r.U8();
+                        dynel["Tag"] = BinaryStreamString(r);
+                    }
+                }
+                records.Add(dynel);
+            }
+            return new { Dynels = records };
+        }
+
+        /// <summary>u16 n, char[n]; n = 0xffff is followed by u16 0x1ff and a u32 length (BinaryStream::ReadString).</summary>
+        private static string BinaryStreamString(SpanReader r)
+        {
+            int length = r.U16();
+            if (length == 0xffff)
+            {
+                var marker = r.U16();
+                if (marker != 0x1ff) throw new InvalidDataException($"Bad long-string marker 0x{marker:x}.");
+                length = (int)r.U32();
+            }
+            return r.Latin1(length);
         }
 
         /// <summary>A name from <paramref name="names"/>, or the number itself if it's out of range.</summary>

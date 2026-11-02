@@ -601,5 +601,12 @@
     "id": 1000049,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "Lights" ]
+  },
+  {
+    "name": "Simple Dynels",
+    "isSwl": true,
+    "id": 1000057,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "Dynels" ]
   }
 ]
