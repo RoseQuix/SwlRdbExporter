@@ -41,6 +41,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `HeightmapExporter` writes GHM1 heightmaps (1066604) as 16-bit greyscale PNG through `Utilities/PngWriter` (SkiaSharp can't encode 16-bit grey), with a JSON sidecar holding the scale.
 - `RasterExporter` writes the {u32 version, u32 width, u32 height} + texels rasters: `R8` (FAOGen AO textures, 1010043) as 8-bit PNG, `R32F` (rain/snow occluder heights, 1066611) as PFM.
 - `StatelsExporter` / `StatelsParser` decode the per-playfield static mesh placements (1000060): visual type and id (named from the filename index), position, rotation quaternion (x, y, z, w), scale and flags. Version 0x5000 stores matrices, which are also converted.
+- `PlacementExporter` / `PlacementParser` decode the other per-playfield types to JSON; `Arguments[0]` names the layout in `PlacementParser.Layouts`. Layouts build dictionaries (field names from the notes) and read through `Utilities/SpanReader`, which throws `InvalidDataException` past the end.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` stitches the largest level of each map (1010013) using the MTIL tile index with the same ID (1010012, `MtilParser`), cropping each tile around its centre to the level's tile size (most maps' tiles have a 4-pixel border).
 - `VoiceoverExporter` slices from the first `OggS` marker.

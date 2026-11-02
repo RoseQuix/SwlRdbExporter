@@ -594,5 +594,12 @@
     "isSwl": true,
     "id": 1000060,
     "exporterType": "RdbExporter.Exporters.StatelsExporter"
+  },
+  {
+    "name": "Light Sets",
+    "isSwl": true,
+    "id": 1000049,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "Lights" ]
   }
 ]
