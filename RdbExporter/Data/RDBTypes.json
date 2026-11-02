@@ -759,5 +759,11 @@
     "otherDesc": "CAT2 .ca animations as JSON. Warning: This export is large (~10GB).",
     "exporterType": "RdbExporter.Exporters.Cat2Exporter",
     "exporterArguments": [ "Animation" ]
+  },
+  {
+    "name": "Enlighten Meshes",
+    "id": 1010036,
+    "otherDesc": ".enl meshes as OBJ; never read by the client.",
+    "exporterType": "RdbExporter.Exporters.EnlMeshExporter"
   }
 ]
