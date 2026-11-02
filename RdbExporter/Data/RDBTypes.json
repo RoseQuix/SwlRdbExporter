@@ -184,5 +184,59 @@
     "id": 1066610,
     "otherDesc": "One DXT1 texture per playfield, purpose unknown.",
     "exporterType": "RdbExporter.Exporters.FctxExporter"
+  },
+  {
+    "name": "Binary XML BCT Groups",
+    "isSwl": true,
+    "id": 1010500,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML BCT Meshes",
+    "isSwl": true,
+    "id": 1010501,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML Movement Sets",
+    "isSwl": true,
+    "id": 1010503,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML Formations",
+    "isSwl": true,
+    "id": 1010504,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML Cars",
+    "isSwl": true,
+    "id": 1010505,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML AnimSys",
+    "isSwl": true,
+    "id": 1010511,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML Static AI Points",
+    "isSwl": true,
+    "id": 1010512,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML Monster Data",
+    "isSwl": true,
+    "id": 1010514,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
+  },
+  {
+    "name": "Binary XML Mesh Indices",
+    "isSwl": true,
+    "id": 1010516,
+    "exporterType": "RdbExporter.Exporters.BinaryXmlExporter"
   }
 ]
