@@ -729,5 +729,12 @@
     "id": 1066601,
     "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "GroundDescriptor", "KeepInnerHeader" ]
+  },
+  {
+    "name": "Collision Tag Maps",
+    "isSwl": true,
+    "id": 1066609,
+    "otherDesc": "CTM1: per-metre terrain layer slot as 8-bit PNG, footstep / occlusion tags as JSON.",
+    "exporterType": "RdbExporter.Exporters.CollisionTagMapExporter"
   }
 ]
