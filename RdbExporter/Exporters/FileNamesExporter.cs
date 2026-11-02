@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RdbExporter.Exporters
 {
@@ -31,7 +32,7 @@ namespace RdbExporter.Exporters
                     index.Add(new NameIndex(fileId, Encoding.ASCII.GetString(name).TrimEnd('\0')));
                 }
 
-                var settings = new JsonSerializerOptions() { IgnoreNullValues = true, WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+                var settings = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
                 var output = JsonSerializer.Serialize(index, settings);
                 File.WriteAllText(Path.Combine(parameters.ExportDirectory, $"RDB-{rdbId}.json"), output);
             }

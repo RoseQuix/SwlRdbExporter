@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RdbExporter
 {
@@ -146,7 +147,7 @@ namespace RdbExporter
 
         private static void DumpIndex(string installDir)
         {
-            var settings = new JsonSerializerOptions() { IgnoreNullValues = true, WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            var settings = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             var index = Helpers.GetRdbIndex(installDir);
             File.WriteAllText("Index.json", JsonSerializer.Serialize(index, settings));
         }

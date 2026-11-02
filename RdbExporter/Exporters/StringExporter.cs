@@ -5,6 +5,7 @@ using RdbExporter.Parsers;
 using RdbExporter.Utilities;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace RdbExporter.Exporters
 
             if (tdc2File.Entries.Count == 0) return;
 
-            var settings = new JsonSerializerOptions() { IgnoreNullValues = true, WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            var settings = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             var output = JsonSerializer.Serialize(tdc2File.Entries, settings);
             output = Regex.Replace(output, @"\\u[0-9A-F]{4}", " "); //Replace unicode endpoints, there are mostly variants of non-breaking spaces
 
