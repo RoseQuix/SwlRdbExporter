@@ -671,5 +671,12 @@
     "id": 1040009,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "BoundedAreaScripts" ]
+  },
+  {
+    "name": "Environment Settings",
+    "isSwl": true,
+    "id": 1060668,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "EnvironmentSettings" ]
   }
 ]

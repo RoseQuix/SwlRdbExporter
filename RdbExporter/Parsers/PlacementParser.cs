@@ -2,6 +2,7 @@ using RdbExporter.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace RdbExporter.Parsers
 {
@@ -26,6 +27,7 @@ namespace RdbExporter.Parsers
             ["Destructibles"] = Destructibles,
             ["BoundedAreaScripts"] = BoundedAreaScripts,
             ["BoundedAreaReverb"] = BoundedAreaReverb,
+            ["EnvironmentSettings"] = EnvironmentSettings,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -375,6 +377,66 @@ namespace RdbExporter.Parsers
             }
             return new { Version = version, Records = records };
         }
+
+        /// <summary>
+        /// Environment settings (1060668, RDBPlayfieldEnvironmentSettings_c). Field names are the notes' offsets.
+        ///   "nEfP", u32 version (2-5); u32 n, n × u32 1060667 environment ids
+        ///   environment: f32 a[4]; u8 b4; f32 a5[6]; u32 c[5]; f32 a15[3]; u8 b18; f32 a22[8];
+        ///     &gt; 3: u32 a30, str name, f32 a38;  &gt; 4: f32 a19[3]
+        ///   u32 sky version: 1: u32 mesh, f32 scale[2], 3 × {u32 id, f32[3], u32 n, n × f32[2]}; 2: str sky dome XML
+        ///   optional: u32 1, str precipitation XML
+        /// str = u32 n, UTF-8.
+        /// </summary>
+        private static object EnvironmentSettings(SpanReader r, NameLookup name)
+        {
+            if (!r.Bytes(4).SequenceEqual("nEfP"u8)) throw new InvalidDataException("No nEfP magic (old format).");
+            var version = r.U32();
+            if (version < 2 || version > 5) throw new InvalidDataException($"Unsupported version {version}.");
+            var settings = r.U32s((int)r.U32());
+
+            var environment = new Dictionary<string, object>
+            {
+                ["a"] = r.F32s(4), ["b4"] = r.U8(), ["a5"] = r.F32s(6), ["c"] = r.U32s(5), ["a15"] = r.F32s(3), ["b18"] = r.U8(), ["a22"] = r.F32s(8),
+            };
+            if (version > 3)
+            {
+                environment["a30"] = r.U32();
+                environment["Name"] = Utf8String(r);
+                environment["a38"] = r.F32();
+            }
+            if (version > 4) environment["a19"] = r.F32s(3);
+
+            var skyVersion = r.U32();
+            var sky = new Dictionary<string, object> { ["Version"] = skyVersion };
+            if (skyVersion == 1)
+            {
+                sky["Mesh"] = r.U32();
+                sky["Scale"] = r.F32s(2);
+                var hours = new List<object>();
+                for (var i = 0; i < 3; i++)
+                {
+                    var id = r.U32();
+                    var values = r.F32s(3);
+                    var pairs = new List<float[]>();
+                    for (var n = r.U32(); n > 0; n--) pairs.Add(r.F32s(2));
+                    hours.Add(new { Id = id, Values = values, Pairs = pairs });
+                }
+                sky["Hours"] = hours;
+            }
+            else if (skyVersion == 2) sky["Xml"] = Utf8String(r);
+            else throw new InvalidDataException($"Unsupported sky version {skyVersion}.");
+
+            string rainSnow = null;
+            if (r.Remaining > 0)
+            {
+                var rainSnowVersion = r.U32();
+                if (rainSnowVersion != 1) throw new InvalidDataException($"Unsupported rain/snow version {rainSnowVersion}.");
+                rainSnow = Utf8String(r);
+            }
+            return new { Version = version, Settings = settings, Environment = environment, Sky = sky, RainSnowXml = rainSnow };
+        }
+
+        private static string Utf8String(SpanReader r) => System.Text.Encoding.UTF8.GetString(r.Bytes((int)r.U32()));
 
         /// <summary>BoxCluster_t: array children, f32 box[6], u8 isLeaf, [isLeaf] u32 index.</summary>
         private static object BoxCluster(SpanReader r)
