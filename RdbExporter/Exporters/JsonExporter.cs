@@ -35,22 +35,26 @@ namespace RdbExporter.Exporters
         {
             Parallel.ForEach(parameters.RdbFileEntries, entry =>
             {
+                var data = entry.ReadAllBytes(parameters.SwlInstallDir, KeepInnerHeader(parameters));
+                object value;
                 try
                 {
-                    var data = entry.ReadAllBytes(parameters.SwlInstallDir, KeepInnerHeader(parameters));
+                    value = Parse(parameters, entry, data);
+                }
+                catch (InvalidDataException e)
+                {
                     if (Helpers.LooksLikeXml(data))
                     {
                         //A few binary types also hold misfiled XML sources
                         File.WriteAllBytes(Helpers.GetOutputPath(parameters, entry, ".xml", true), data);
-                        return;
                     }
-                    var value = Parse(parameters, entry, data);
-                    File.WriteAllText(Helpers.GetOutputPath(parameters, entry, ".json", true), JsonSerializer.Serialize(value, GetOptions(parameters)));
+                    else
+                    {
+                        Console.Error.WriteLine($"RDB ID '{entry.Id}': {e.Message}");
+                    }
+                    return;
                 }
-                catch (InvalidDataException e)
-                {
-                    Console.Error.WriteLine($"RDB ID '{entry.Id}': {e.Message}");
-                }
+                File.WriteAllText(Helpers.GetOutputPath(parameters, entry, ".json", true), JsonSerializer.Serialize(value, GetOptions(parameters)));
             });
         }
     }

@@ -46,11 +46,13 @@ namespace RdbExporter.Utilities
         }
 
         /// <summary>
-        /// Whether an entry is an XML document ("&lt;?" or "&lt;" and a letter), as some binary types also hold XML sources.
+        /// Whether an entry looks like an XML document: "&lt;" and a letter or "?", and the first 64 bytes are printable
+        /// text. Some binary types also hold misfiled XML sources, but binary data can start with "&lt;" too.
         /// </summary>
         public static bool LooksLikeXml(byte[] data)
         {
-            return data.Length > 1 && data[0] == '<' && (data[1] == '?' || char.IsAsciiLetter((char)data[1]));
+            if (data.Length < 2 || data[0] != '<' || !(data[1] == '?' || char.IsAsciiLetter((char)data[1]))) return false;
+            return data.Take(64).All(b => b >= 0x20 && b < 0x7f || b == '\t' || b == '\r' || b == '\n');
         }
 
         /// <summary>

@@ -117,9 +117,9 @@
   },
   {
     "name": "Particle Effects",
+    "isSwl": true,
     "id": 1010207,
-    "exporterType": "RdbExporter.Exporters.RawFileExporter",
-    "exporterArguments": [ ".particleeffect" ]
+    "exporterType": "RdbExporter.Exporters.ParticleEffectExporter"
   },
   {
     "name": "File Names Index",
