@@ -13,17 +13,19 @@ dotnet build RdbExporter.sln
 dotnet run --project RdbExporter -- -i "<SWL install dir>" -l          # list known types used by SWL (-la for all)
 dotnet run --project RdbExporter -- -i "<SWL install dir>" --rdb strings # export by name or numeric ID
 dotnet run --project RdbExporter -- -i "<SWL install dir>" --rdb 1010042 -r  # force raw .dat export
+dotnet run --project RdbExporter -- -i "<SWL install dir>" -d strings -d 1010004  # --rdb repeats
+dotnet run --project RdbExporter -- -i "<SWL install dir>" -a -d Textures -o out  # every type except Textures
 dotnet run --project RdbExporter -- -i "<SWL install dir>" -di         # dump le.idx to Index.json
 ```
 
-Exports are written to `<current dir>/<TypeId> - <Name>/`.
+Exports are written to `<output dir>/<TypeId> - <Name>/`, where the output dir is `-o` / `--out` or the current directory (`Index.json` from `-di` goes there too). With `-a` / `--all`, every type in the index is exported and the `--rdb` types are left out; a failing type is reported and the rest continue. The process exits 1 when any type fails or has no entries. A full export is far larger than the 32 GB of RDB data (meshes, textures and animations alone are tens of GB).
 
 ## Architecture
 
 **Index → entry → exporter pipeline.**
 1. `Parsers/IBDRParser` reads `<install>/RDB/le.idx` (magic `IBDR`) into a list of `IDBRIndexEntrty` (RDB type, ID, file number, offset, length). Entries with file number 255 are dropped. `Helpers.GetRdbIndex` caches this statically.
 2. `IDBRIndexEntrty.OpenEntryFile` opens `RDB/NN.rdbdata`, seeks to `FileOffset - 16`, validates a 16-byte header (type, id, length, unknown), and then detects an optional extra 12-byte header that starts with the type ID. If present, it skips it and **mutates `FileLength`** to the payload length. Consumers should read `entry.FileLength` bytes only *after* calling `OpenEntryFile`.
-3. `Program.cs` resolves the `--rdb` argument against `Data/RDBTypes.json`, filters index entries to that type, builds `ExportParameters`, and instantiates the exporter **by reflection** from the JSON `exporterType` string (`Type.GetType(...)` + `Activator.CreateInstance`). Unknown numeric types and `-r` fall back to `RawFileExporter` with `.dat`.
+3. `Program.cs` resolves each `--rdb` argument (or, with `--all`, each type in the index) against `Data/RDBTypes.json`, filters index entries to that type, builds `ExportParameters`, and instantiates the exporter **by reflection** from the JSON `exporterType` string (`Type.GetType(...)` + `Activator.CreateInstance`). Unknown numeric types and `-r` fall back to `RawFileExporter` with `.dat`.
 
 **Adding support for an RDB type** is usually just a `Data/RDBTypes.json` entry (`name`, `id`, `isSwl`, `exporterType` as a fully qualified class name, `exporterArguments`, `otherDesc`). JSON is case-insensitive and allows trailing commas. A new format needs a class implementing `Exporters/IExporter` (`RunExport(ExportParameters)`). Exporters typically use `Parallel.ForEach` over `RdbFileEntries`.
 
