@@ -953,5 +953,101 @@
     "id": 1010007,
     "otherDesc": "Character-creator face morph targets as JSON (per-vertex offsets per submesh).",
     "exporterType": "RdbExporter.Exporters.MorphExporter"
+  },
+  {
+    "name": "XML Mesh Index Files",
+    "isSwl": true,
+    "id": 1010030,
+    "otherDesc": "Text XML <MeshIndexFile> (.idx): render / skinned meshes, LODs, collision, skeleton, attractors, materials, morph groups; LMXB twin 1010516.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Effect Packages",
+    "isSwl": true,
+    "id": 1000622,
+    "otherDesc": "Text XML, root <effectpackage> (timelines of typed effects); 19 entries are misfiled <particlesystem> sources.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Script Groups",
+    "isSwl": true,
+    "id": 1010028,
+    "otherDesc": "Text XML, root <scriptgroup>: ScryScript groups (mostly 3D sounds), placed by 1000504.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Monster Data",
+    "isSwl": true,
+    "id": 1010201,
+    "otherDesc": "Text XML, root <monsterdata>: NPC to skeleton, animsys, meshes, movement sets; LMXB twin 1010514.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Territories",
+    "isSwl": true,
+    "id": 1000050,
+    "otherDesc": "Text XML, root <territories>, per playfield.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Bounded Area Collections",
+    "isSwl": true,
+    "id": 1040010,
+    "otherDesc": "Text XML, root <BoundedAreaCollections>: per-playfield bounded-area sound collections.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Animation Systems",
+    "isSwl": true,
+    "id": 1010200,
+    "otherDesc": "Text XML, root <animsys>: animation set per skeleton; LMXB twin 1010511.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Bounded Areas",
+    "isSwl": true,
+    "id": 1000053,
+    "otherDesc": "Text XML, <boundedareas> and related roots (several per entry), per playfield.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Texture Scripts",
+    "isSwl": true,
+    "id": 1010035,
+    "otherDesc": "Text XML, root <texscript>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Environment Settings",
+    "isSwl": true,
+    "id": 1060667,
+    "otherDesc": "Text XML, root <EnvironmentSettings>: per-hour sky, fog, godrays, used by 1000059 environment areas.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Formations",
+    "isSwl": true,
+    "id": 1010400,
+    "otherDesc": "Text XML, root <formation>; LMXB twin 1010504.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
+  },
+  {
+    "name": "XML Rivers",
+    "isSwl": true,
+    "id": 1000075,
+    "otherDesc": "Text XML, root <rivers>.",
+    "exporterType": "RdbExporter.Exporters.RawFileExporter",
+    "exporterArguments": [ ".xml" ]
   }
 ]

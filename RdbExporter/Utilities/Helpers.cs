@@ -82,7 +82,8 @@ namespace RdbExporter.Utilities
                 {
                     name += $".{entry.Id}";
                 }
-                return Path.Combine(parameters.ExportDirectory, name + (replaceNamedExtension ? extension : Path.GetExtension(filename)));
+                var namedExtension = Path.GetExtension(filename);
+                return Path.Combine(parameters.ExportDirectory, name + (replaceNamedExtension || namedExtension == "" ? extension : namedExtension));
             }
             return Path.ChangeExtension(Path.Combine(parameters.ExportDirectory, entry.Id.ToString()), extension);
         }
