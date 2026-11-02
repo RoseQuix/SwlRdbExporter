@@ -24,6 +24,8 @@ namespace RdbExporter.Parsers
             ["EnvironmentAreas"] = EnvironmentAreas,
             ["Doors"] = Doors,
             ["Destructibles"] = Destructibles,
+            ["BoundedAreaScripts"] = BoundedAreaScripts,
+            ["BoundedAreaReverb"] = BoundedAreaReverb,
         };
 
         public static object Parse(string layout, byte[] data, NameLookup name)
@@ -321,6 +323,57 @@ namespace RdbExporter.Parsers
             var destructibles = new List<uint[]>();
             for (var i = BinaryStreamCount(r, 30000); i > 0; i--) destructibles.Add(r.U32s(21));
             return new { Destructibles = destructibles, Tree = BoxCluster(r) };
+        }
+
+        /// <summary>
+        /// Bounded-area fixed 3D ambience (1040007) and music (1040009), keyed by 1000055 sensor volume.
+        /// u32 version, u32 count, then count × {u32 volume; u32 priority (7: always plays); &gt;= 2: u8 group;
+        /// u32 n, n × u32 script (indices into the playfield's 1000504 ScryScripts)}
+        /// </summary>
+        private static object BoundedAreaScripts(SpanReader r, NameLookup name)
+        {
+            var version = r.U32();
+            var records = new List<object>();
+            for (var count = r.U32(); count > 0; count--)
+            {
+                records.Add(new { Volume = r.U32(), Priority = r.U32(), Group = version >= 2 ? r.U8() : (byte)0, Scripts = r.U32s((int)r.U32()) });
+            }
+            return new { Version = version, Records = records };
+        }
+
+        /// <summary>The sound engine's 85 reverb presets (m_ReverbPresets): FMOD's standard set, then two more sets.</summary>
+        private static readonly string[] ReverbPresets =
+        {
+            "Off", "Generic", "Padded Cell", "Room", "Bathroom", "Living Room", "Stone Room", "Auditorium",
+            "Concert Hall", "Cave", "Arena", "Hangar", "Carpeted Hallway", "Hallway", "Stone Corridor", "Alley",
+            "Forest", "City", "Mountains", "Quarry", "Plain", "Parking Lot", "Sewer Pipe", "Underwater", "Drugged",
+            "Dizzy", "Psychotic", "Empty Stadium", "Full Stadium", "Stadium Tannoy", "Squash Court",
+            "Small Swimming Pool", "Large Swimming Pool", "Gymnasium", "Workshop", "School Room", "Practice Room",
+            "Outhouse", "Caravan", "Domed Tomb", "Saint Paul's Dome", "Small Pipe", "Long Thin Pipe", "Large Pipe",
+            "Resonant Pipe", "Backyard", "Rolling Plains", "Deep Canyon", "Creek", "Valley", "Heaven", "Hell",
+            "Memory", "Race Commentator", "Pit Garage", "In-car (Stripped out racer)", "In-car (Sportscar)",
+            "In-car (Luxury)", "Full Grandstand", "Empty Grandstand", "Tunnel", "City Streets", "Subway", "Museum",
+            "Library", "Underpass", "Abandoned City", "Dusty Box Room", "Chapel", "Small Water Room", "No Reverb",
+            "Generic", "Forest", "Canyon", "Mountain", "City", "Arena", "Wood Room Small", "Wood Room Large",
+            "Stone Room Small", "Stone Room Large", "Cave Small", "Cave Large", "Throne Room", "Sewers",
+        };
+
+        /// <summary>
+        /// Bounded-area reverb (1040008), keyed by 1000055 sensor volume. u32 version, u32 count, then
+        /// count × {u32 volume; u32 preset (index into ReverbPresets); u8 priority (used from version 2 on, else 0)}
+        /// </summary>
+        private static object BoundedAreaReverb(SpanReader r, NameLookup name)
+        {
+            var version = r.U32();
+            var records = new List<object>();
+            for (var count = r.U32(); count > 0; count--)
+            {
+                var volume = r.U32();
+                var preset = r.U32();
+                var priority = r.U8();
+                records.Add(new { Volume = volume, Preset = preset, PresetName = preset < ReverbPresets.Length ? ReverbPresets[preset] : null, Priority = version >= 2 ? priority : 0, StoredPriority = priority });
+            }
+            return new { Version = version, Records = records };
         }
 
         /// <summary>BoxCluster_t: array children, f32 box[6], u8 isLeaf, [isLeaf] u32 index.</summary>

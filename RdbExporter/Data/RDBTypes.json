@@ -650,5 +650,26 @@
     "id": 1000061,
     "exporterType": "RdbExporter.Exporters.PlacementExporter",
     "exporterArguments": [ "Destructibles" ]
+  },
+  {
+    "name": "Bounded Area Ambience",
+    "isSwl": true,
+    "id": 1040007,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "BoundedAreaScripts" ]
+  },
+  {
+    "name": "Bounded Area Reverb",
+    "isSwl": true,
+    "id": 1040008,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "BoundedAreaReverb" ]
+  },
+  {
+    "name": "Bounded Area Music",
+    "isSwl": true,
+    "id": 1040009,
+    "exporterType": "RdbExporter.Exporters.PlacementExporter",
+    "exporterArguments": [ "BoundedAreaScripts" ]
   }
 ]
