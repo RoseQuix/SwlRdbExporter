@@ -19,6 +19,7 @@ namespace RdbExporter.Parsers
             ["SoundSet"] = SoundSet,
             ["OldPlayfield"] = OldPlayfield,
             ["TextureDescriptor"] = TextureDescriptor,
+            ["AoAtlas"] = AoAtlas,
         };
 
         /// <summary>
@@ -201,6 +202,80 @@ namespace RdbExporter.Parsers
             for (var count = r.U8(); count > 0; count--) slots.Add(new { Id = r.U32(), A = r.I32(), B = r.U32(), Slot = r.U8(), Flag = r.U8() });
             descriptor["Slots"] = slots;
             return descriptor;
+        }
+
+        /// <summary>
+        /// FAOGen ambient occlusion atlas descriptors (1010039), id = playfield. Version 6 is what the client reads:
+        ///   u32 6, meshGroups, terrainGroups, meshCount, terrainCount
+        ///   groups × {u32 count, tile width, tile height, texture width, texture height, texture (1010043)}
+        ///   meshes × {u64 instance, u32 fme (1010001), submesh, group, slot}
+        ///   terrain × {u32 t0, t1, group (indexes the terrain groups, after the mesh groups), t3}
+        /// Version 5 (rejected by the client) keeps its textures inline; their texels are written as base64.
+        ///   u32 5, meshGroups, terrainCount, meshCount, texelBytes, groupCount
+        ///   meshes × {u64 instance, u32 fme, submesh, vertexCount, texels, group, slot, width, height}
+        ///   groups × {u32 count, tile width, tile height, texture width, texture height}, then each group's texels,
+        ///   then terrainCount × {u32 width, height, texels}
+        /// An instance's tile starts at column slot % (texture width / tile width), row slot / that.
+        /// </summary>
+        private static object AoAtlas(SpanReader r, LayoutNameLookup name)
+        {
+            var version = r.U32();
+            if (version == 6)
+            {
+                var meshGroups = r.U32();
+                var terrainGroups = r.U32();
+                var meshCount = r.U32();
+                var terrainCount = r.U32();
+                var groups = new List<object>();
+                for (var i = 0; i < meshGroups + terrainGroups; i++)
+                {
+                    groups.Add(new { Count = r.U32(), TileWidth = r.U32(), TileHeight = r.U32(), TextureWidth = r.U32(), TextureHeight = r.U32(), Texture = r.U32() });
+                }
+                var meshes = new List<object>();
+                for (var i = 0; i < meshCount; i++)
+                {
+                    var instance = r.U64();
+                    var fme = r.U32();
+                    meshes.Add(new { Instance = instance, Fme = fme, FmeName = name(1010001, fme), Submesh = r.U32(), Group = r.U32(), Slot = r.U32() });
+                }
+                var terrain = new List<object>();
+                for (var i = 0; i < terrainCount; i++) terrain.Add(new { T0 = r.U32(), T1 = r.U32(), Group = r.U32() + meshGroups, T3 = r.U32() });
+                return new { Version = version, MeshGroups = meshGroups, Groups = groups, Meshes = meshes, Terrain = terrain };
+            }
+            if (version == 5)
+            {
+                var meshGroups = r.U32();
+                var terrainCount = r.U32();
+                var meshCount = r.U32();
+                var texelBytes = r.U32();
+                var groupCount = r.U32();
+                var meshes = new List<object>();
+                for (var i = 0; i < meshCount; i++)
+                {
+                    var instance = r.U64();
+                    var fme = r.U32();
+                    meshes.Add(new { Instance = instance, Fme = fme, FmeName = name(1010001, fme), Submesh = r.U32(), VertexCount = r.U32(), Texels = r.U32(), Group = r.U32(), Slot = r.U32(), Width = r.U32(), Height = r.U32() });
+                }
+                var groupSizes = new List<uint[]>();
+                for (var i = 0; i < groupCount; i++) groupSizes.Add(r.U32s(5));
+                long total = 0;
+                foreach (var g in groupSizes) total += (long)g[3] * g[4];
+                if (total != texelBytes) throw new InvalidDataException("Version 5 texel byte count doesn't match the groups.");
+                var groups = new List<object>();
+                foreach (var g in groupSizes)
+                {
+                    groups.Add(new { Count = g[0], TileWidth = g[1], TileHeight = g[2], TextureWidth = g[3], TextureHeight = g[4], Texels = r.Bytes((int)(g[3] * g[4])).ToArray() });
+                }
+                var terrain = new List<object>();
+                for (var i = 0; i < terrainCount; i++)
+                {
+                    var width = r.U32();
+                    var height = r.U32();
+                    terrain.Add(new { Width = width, Height = height, Texels = r.Bytes((int)(width * height)).ToArray() });
+                }
+                return new { Version = version, MeshGroups = meshGroups, Groups = groups, Meshes = meshes, Terrain = terrain };
+            }
+            throw new InvalidDataException($"Unsupported version {version}.");
         }
     }
 }

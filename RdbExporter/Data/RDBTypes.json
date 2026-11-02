@@ -779,5 +779,13 @@
     "otherDesc": "Never read by the client; their slot ids exist nowhere.",
     "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "TextureDescriptor" ]
+  },
+  {
+    "name": "Ambient Occlusion Atlases",
+    "isSwl": true,
+    "id": 1010039,
+    "otherDesc": "FAOGen atlas descriptors: which mesh instance uses which 1010043 texture tile.",
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "AoAtlas" ]
   }
 ]
