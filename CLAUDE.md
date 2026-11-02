@@ -33,6 +33,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `StringExporter` ignores `RdbFileEntries` and pulls type `1030002` (TDC2 string tables, `TDC2Parser`) directly from the index. It names output via language files `<install>/Data/Text/*.tdbl` (folder name matched case-insensitively) (TDL1, `TDL1Parser`), and writes per-language JSON plus an `Unknown` folder for unreferenced tables.
 - `BinaryXmlExporter` / `LmxbParser` convert LMXB binary XML (1010500–1010516) to text XML. Each type's bundle (ID 1) has many roots, which get wrapped in `<bundle>`. Characters XML can't hold become U+FFFD.
 - `ProtobufExporter` decodes protobuf types to JSON. `Arguments[0]` names the message; the classes are generated at build time (Grpc.Tools) from `Protos/*.proto`, schemas recovered from the client exe, with `option csharp_namespace = "RdbExporter.Protos"` added. `LooksPacket.proto`'s `HasAttractorPlacement` is renamed (keeping its JSON name) because it clashes with the generated presence property of `AttractorPlacement`.
+- `LuaScriptExporter` splits the Lua script list (1010223) into `ScriptID<id>.lua` files (the module name scripts `require`) plus `Index.json` with each script's source.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` splits concatenated JPEGs on `FF D9` and stitches map tiles using hard-coded grid-size detection, with a 7px overlap offset.
 - `VoiceoverExporter` slices from the first `OggS` marker.

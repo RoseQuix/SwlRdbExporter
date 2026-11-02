@@ -243,8 +243,7 @@
     "name": "Lua Scripts",
     "isSwl": true,
     "id": 1010223,
-    "exporterType": "RdbExporter.Exporters.ProtobufExporter",
-    "exporterArguments": [ "LuaScriptList" ]
+    "exporterType": "RdbExporter.Exporters.LuaScriptExporter"
   },
   {
     "name": "Quest Givers",
