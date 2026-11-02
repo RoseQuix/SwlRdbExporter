@@ -712,5 +712,12 @@
     "id": 1010220,
     "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "GrassConfig" ]
+  },
+  {
+    "name": "Grass Texture To Mesh",
+    "isSwl": true,
+    "id": 1010303,
+    "exporterType": "RdbExporter.Exporters.LayoutExporter",
+    "exporterArguments": [ "GrassTextureToMesh" ]
   }
 ]

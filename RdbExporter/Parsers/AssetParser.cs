@@ -15,6 +15,7 @@ namespace RdbExporter.Parsers
             ["Attractors"] = Attractors,
             ["MorphNames"] = MorphNames,
             ["GrassConfig"] = GrassConfig,
+            ["GrassTextureToMesh"] = GrassTextureToMesh,
         };
 
         /// <summary>
@@ -120,6 +121,22 @@ namespace RdbExporter.Parsers
                 config["Regions"] = r.U32s((int)(nx * ny));
             }
             return config;
+        }
+
+        /// <summary>
+        /// GrassTextureToMesh (1010303, one entry): u32 version (1), u32 count, count × {i32 texture (1010217), i32 mesh (1010221), i32 key}.
+        /// </summary>
+        private static object GrassTextureToMesh(SpanReader r, LayoutNameLookup name)
+        {
+            var version = r.U32();
+            if (version != 1) throw new InvalidDataException($"Unsupported version {version}.");
+            var rows = new List<object>();
+            for (var count = r.U32(); count > 0; count--)
+            {
+                var texture = r.I32();
+                rows.Add(new { Texture = texture, TextureName = name(1010217, (uint)texture), Mesh = r.I32(), Key = r.I32() });
+            }
+            return new { Version = version, Rows = rows };
         }
     }
 }
