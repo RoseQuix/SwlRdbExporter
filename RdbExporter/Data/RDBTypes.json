@@ -787,5 +787,12 @@
     "otherDesc": "FAOGen atlas descriptors: which mesh instance uses which 1010043 texture tile.",
     "exporterType": "RdbExporter.Exporters.LayoutExporter",
     "exporterArguments": [ "AoAtlas" ]
+  },
+  {
+    "name": "Water",
+    "isSwl": true,
+    "id": 1000054,
+    "otherDesc": "Per-playfield shore mask / foam grids as PNG and PFM, portal mesh as OBJ.",
+    "exporterType": "RdbExporter.Exporters.WaterExporter"
   }
 ]

@@ -46,6 +46,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `CollisionTagMapExporter` writes collision tag maps (1066609; raw after `CTM1`, zlib after an inner header) as an 8-bit PNG of per-metre terrain layer slots plus JSON with the 256 footstep / occlusion tags.
 - `LayerHeightmapExporter` writes terrain layer height maps (1000069) as an 8-bit PNG of the top mip plus the baked BC5 normal map as `<id>_normal.dds`.
 - `Cat2Exporter` / `Cat2Parser` write CAT2 skeletons (1010002) and animations (1010003) as JSON. Version 3 tracks only store an FNV-1 hash of the bone name, so names are resolved from every skeleton's bones. Animation JSON isn't indented (`JsonExporter.GetOptions`).
+- `WaterExporter` splits water data (1000054) into 16-bit PNGs of the four u16 cell fields, an RGB PFM of the foam coordinates, the portal mesh as OBJ and a JSON header.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` stitches the largest level of each map (1010013) using the MTIL tile index with the same ID (1010012, `MtilParser`), cropping each tile around its centre to the level's tile size (most maps' tiles have a 4-pixel border).
 - `VoiceoverExporter` slices from the first `OggS` marker.
