@@ -305,5 +305,257 @@
     "isSwl": true,
     "id": 1000621,
     "exporterType": "RdbExporter.Exporters.ItemTemplateExporter"
+  },
+  {
+    "name": "Feats",
+    "isSwl": true,
+    "id": 1000042,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Feat Classes",
+    "isSwl": true,
+    "id": 1000043,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Feat Points",
+    "isSwl": true,
+    "id": 1000044,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Feat Point Costs",
+    "isSwl": true,
+    "id": 1000099,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Default Hair Meshes",
+    "isSwl": true,
+    "id": 1000080,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Hair Mesh Replacements",
+    "isSwl": true,
+    "id": 1000081,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Playfield Parents",
+    "isSwl": true,
+    "id": 1000052,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Character Creator Asset Lists",
+    "id": 1000071,
+    "otherDesc": "Never read by the client.",
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Player Class Map",
+    "isSwl": true,
+    "id": 1000505,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Player Class Membership",
+    "isSwl": true,
+    "id": 1000506,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Player Class Values",
+    "isSwl": true,
+    "id": 1000507,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Species Names",
+    "isSwl": true,
+    "id": 1000508,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "PvP Playfield Data",
+    "isSwl": true,
+    "id": 1000509,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "PvP Playfield Table",
+    "isSwl": true,
+    "id": 1000510,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Unused Table 1000511",
+    "id": 1000511,
+    "otherDesc": "Never read by the client.",
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "PvP Playfield Pairs",
+    "isSwl": true,
+    "id": 1000512,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Combo Lookup",
+    "isSwl": true,
+    "id": 1000513,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Armor Mitigation",
+    "isSwl": true,
+    "id": 1000514,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Unused Table 1000515",
+    "id": 1000515,
+    "otherDesc": "Never read by the client.",
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Game Tweaks",
+    "isSwl": true,
+    "id": 1000516,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Guild Governing Forms",
+    "isSwl": true,
+    "id": 1000517,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Guild Ranks",
+    "isSwl": true,
+    "id": 1000518,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Tokens",
+    "isSwl": true,
+    "id": 1000520,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Guild Renown Rewards",
+    "isSwl": true,
+    "id": 1000521,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "PvP Performance Groups",
+    "isSwl": true,
+    "id": 1000522,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "PvP Playfield Scores",
+    "isSwl": true,
+    "id": 1000523,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Deck Abilities",
+    "isSwl": true,
+    "id": 1000524,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Token States",
+    "isSwl": true,
+    "id": 1000625,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Chat Filter",
+    "isSwl": true,
+    "id": 1000626,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Feat Specialized Trees",
+    "isSwl": true,
+    "id": 1065101,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "PvP Con Ratings",
+    "isSwl": true,
+    "id": 1065103,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Character XP",
+    "isSwl": true,
+    "id": 1065201,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Aux Weapon XP",
+    "isSwl": true,
+    "id": 1065202,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Weapon XP",
+    "isSwl": true,
+    "id": 1065203,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Item XP",
+    "isSwl": true,
+    "id": 1065204,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Item Pricing",
+    "isSwl": true,
+    "id": 1065205,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "AP SP XP",
+    "isSwl": true,
+    "id": 1065206,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "XP Table 1065207",
+    "isSwl": true,
+    "id": 1065207,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Inventory Expansion",
+    "isSwl": true,
+    "id": 1065208,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Login Reward Periods",
+    "isSwl": true,
+    "id": 1065209,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Login Rewards",
+    "isSwl": true,
+    "id": 1065210,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
+  },
+  {
+    "name": "Agent XP",
+    "isSwl": true,
+    "id": 1065211,
+    "exporterType": "RdbExporter.Exporters.DataTableExporter"
   }
 ]

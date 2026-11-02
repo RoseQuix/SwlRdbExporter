@@ -37,6 +37,7 @@ Exports are written to `<current dir>/<TypeId> - <Name>/`.
 - `MeshExporter` / `FmeParser` convert FME meshes (1010001) to OBJ (positions, normals, first UV set, one group per submesh) with an `.mtl` whose `map_Kd` / `map_Bump` point at `../1010004 - Textures/`, where the texture export writes the DDS files. Material parameters such as `g_DiffuseTex=0` index the submesh's texture list.
 - `JsonExporter` is the base for binary → JSON exporters: override `Parse(entry, data)` and throw `InvalidDataException` for entries that don't parse.
 - `ItemTemplateExporter` / `ItemTemplateParser` decode item (1000620) and spell (1000621) templates. Some entries store string lengths in UTF-16 units (a bug in Funcom's export tool); the parser backtracks over the possible readings and records them in `StringReadings`.
+- `DataTableExporter` / `DataTableParser` decode the 42 small one-entry tables (feats, hair, playfield parents, XP, tokens, game tweaks, login rewards, …), one layout function per type. Columns without a known meaning are written as `Values` arrays.
 - `SwfImageExporter` / `SwfImageParser` extract bitmaps from embedded SWF, using `Utilities/BittableBinaryReader` for bit-level reads.
 - `MergedJpgExporter` splits concatenated JPEGs on `FF D9` and stitches map tiles using hard-coded grid-size detection, with a 7px overlap offset.
 - `VoiceoverExporter` slices from the first `OggS` marker.
