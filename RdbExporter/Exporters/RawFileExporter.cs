@@ -17,17 +17,7 @@ namespace RdbExporter.Exporters
 
         public void Process(ExportParameters parameters, IDBRIndexEntrty entry)
         {
-            string outputPath;
-            var filenameIndex = Helpers.GetFilenameIndex(parameters.SwlInstallDir);
-            if(filenameIndex.TryGetValue(entry.Type, out var idToNameDictionary) && idToNameDictionary.TryGetValue(entry.Id, out var filename))
-            {
-                //The file RDB Type and File ID exist in the name index, so lets use the name from there
-                outputPath = Path.Combine(parameters.ExportDirectory, filename);
-            }
-            else
-            {
-                 outputPath = Path.ChangeExtension(Path.Combine(parameters.ExportDirectory, entry.Id.ToString()), parameters.Arguments[0]);
-            }
+            var outputPath = Helpers.GetOutputPath(parameters, entry, parameters.Arguments[0]);
 
             using var reader = entry.OpenEntryFile(parameters.SwlInstallDir);
             using var writer = File.OpenWrite(outputPath);

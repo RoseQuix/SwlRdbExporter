@@ -47,5 +47,14 @@ namespace RdbExporter.Entities
 
             return reader;
         }
+
+        /// <summary>
+        /// Reads the entry's payload, without the optional 12-byte inner header.
+        /// </summary>
+        public byte[] ReadAllBytes(string installDir)
+        {
+            using var reader = OpenEntryFile(installDir);
+            return reader.ReadBytes(FileLength);
+        }
     }
 }

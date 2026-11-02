@@ -1,6 +1,7 @@
 ﻿using RdbExporter.Entities;
 using RdbExporter.Parsers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace RdbExporter.Utilities
         private static Lazy<List<RdbType>> _knownRdbTypes = new Lazy<List<RdbType>>(GetKnownRdbTypes, true);
         private static List<IDBRIndexEntrty> _rdbIndex;
         private static Dictionary<int, Dictionary<int, string>> _filenameIndex;
+        private static ConcurrentDictionary<int, HashSet<string>> _sharedFilenames = new ConcurrentDictionary<int, HashSet<string>>();
 
         public static List<IDBRIndexEntrty> GetRdbIndex(string installDir)
         {
@@ -41,6 +43,30 @@ namespace RdbExporter.Utilities
                 return _knownRdbTypes.Value.FirstOrDefault(r => r.Id == id);
             }
             return _knownRdbTypes.Value.FirstOrDefault(r => string.Equals(r.Name, nameOrId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Output path for an entry: its name from the filename index if it has one (with its extension changed to
+        /// <paramref name="extension"/> if <paramref name="replaceNamedExtension"/> is set), otherwise its ID with <paramref name="extension"/>.
+        /// Some names are shared by several IDs of a type, so those also get the ID appended.
+        /// </summary>
+        public static string GetOutputPath(ExportParameters parameters, IDBRIndexEntrty entry, string extension, bool replaceNamedExtension = false)
+        {
+            if (GetFilenameIndex(parameters.SwlInstallDir).TryGetValue(entry.Type, out var idToNameDictionary) && idToNameDictionary.TryGetValue(entry.Id, out var filename))
+            {
+                var sharedNames = _sharedFilenames.GetOrAdd(entry.Type, _ => idToNameDictionary.Values
+                    .GroupBy(n => Path.GetFileNameWithoutExtension(n), StringComparer.OrdinalIgnoreCase)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase));
+                var name = Path.GetFileNameWithoutExtension(filename);
+                if (sharedNames.Contains(name))
+                {
+                    name += $".{entry.Id}";
+                }
+                return Path.Combine(parameters.ExportDirectory, name + (replaceNamedExtension ? extension : Path.GetExtension(filename)));
+            }
+            return Path.ChangeExtension(Path.Combine(parameters.ExportDirectory, entry.Id.ToString()), extension);
         }
 
         public static Dictionary<int, Dictionary<int, string>> GetFilenameIndex(string installDir)

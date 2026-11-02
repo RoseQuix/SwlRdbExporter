@@ -147,5 +147,42 @@
     "id": 1010008,
     "exporterType": "RdbExporter.Exporters.RawFileExporter",
     "exporterArguments": [ ".png" ]
+  },
+  {
+    "name": "Textures",
+    "isSwl": true,
+    "id": 1010004,
+    "otherDesc": "FCTX converted to DDS; normal maps also get a _gloss layer.",
+    "exporterType": "RdbExporter.Exporters.FctxExporter"
+  },
+  {
+    "name": "Terrain Layer Normal Maps",
+    "isSwl": true,
+    "id": 1000096,
+    "exporterType": "RdbExporter.Exporters.FctxExporter"
+  },
+  {
+    "name": "Terrain Layer Diffuse Maps",
+    "isSwl": true,
+    "id": 1010006,
+    "exporterType": "RdbExporter.Exporters.FctxExporter"
+  },
+  {
+    "name": "Terrain Colour Maps",
+    "isSwl": true,
+    "id": 1066606,
+    "exporterType": "RdbExporter.Exporters.FctxExporter"
+  },
+  {
+    "name": "Grass Atlases",
+    "isSwl": true,
+    "id": 1010218,
+    "exporterType": "RdbExporter.Exporters.FctxExporter"
+  },
+  {
+    "name": "Playfield Textures",
+    "id": 1066610,
+    "otherDesc": "One DXT1 texture per playfield, purpose unknown.",
+    "exporterType": "RdbExporter.Exporters.FctxExporter"
   }
 ]
